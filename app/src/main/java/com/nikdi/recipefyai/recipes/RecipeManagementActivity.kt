@@ -35,7 +35,8 @@ class RecipeManagementActivity : AppCompatActivity(), RecipeMethodDialog.RecipeM
     }
 
     override fun onTextChosen() {
-        startActivity(Intent(this, RecipeCreationActivity::class.java))
+        val intent = Intent(this, RecipeCreationActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onPhotoChosen() {

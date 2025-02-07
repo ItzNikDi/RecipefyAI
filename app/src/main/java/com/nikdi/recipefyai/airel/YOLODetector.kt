@@ -15,6 +15,7 @@ import com.nikdi.recipefyai.airel.LabelLoader.extractNamesFromMetadata
 import com.nikdi.recipefyai.utils.ImageHandler
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
+import org.tensorflow.lite.gpu.GpuDelegateFactory
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
@@ -45,11 +46,9 @@ class YOLODetector(
 
         val options = InterpreterApi.Options().apply {
             if (compatList.isDelegateSupportedOnThisDevice) {
-                val delegateOptions = compatList.bestOptionsForThisDevice
-                gpuDelegate = GpuDelegate(delegateOptions) // Store reference
-                this.addDelegate(gpuDelegate)
+                this.addDelegate(GpuDelegate(GpuDelegateFactory.Options().setForceBackend(GpuDelegateFactory.Options.GpuBackend.OPENCL).setQuantizedModelsAllowed(true).setInferencePreference(0))) // Use GPU if available
             } else {
-                this.setNumThreads((Runtime.getRuntime().availableProcessors() / 2))
+                this.setNumThreads(Runtime.getRuntime().availableProcessors()) // Use multi-threading on CPU
             }
             Log.d("Delegates", this.delegates.toString())
         }
@@ -86,6 +85,7 @@ class YOLODetector(
         }
     }
 
+
     fun close() {
         gpuDelegate?.close()
         interpreter.close()
@@ -101,10 +101,8 @@ class YOLODetector(
 
         var inferenceTime = SystemClock.uptimeMillis()
 
-        val resizedBitmap = ImageHandler().resizeImage(frame, tensorWidth, tensorHeight)
-
         val tensorImage = TensorImage(INPUT_IMAGE_TYPE)
-        tensorImage.load(resizedBitmap)
+        tensorImage.load(ImageHandler().resizeImage(frame, tensorWidth, tensorHeight))
         val processedImage = imageProcessor.process(tensorImage)
         val imageBuffer = processedImage.buffer
 

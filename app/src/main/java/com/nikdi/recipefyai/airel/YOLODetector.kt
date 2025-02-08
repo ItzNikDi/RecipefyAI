@@ -2,7 +2,6 @@ package com.nikdi.recipefyai.airel
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.SystemClock
 import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.InterpreterApi
@@ -15,7 +14,6 @@ import com.nikdi.recipefyai.airel.LabelLoader.extractNamesFromMetadata
 import com.nikdi.recipefyai.utils.ImageHandler
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
-import org.tensorflow.lite.gpu.GpuDelegateFactory
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
@@ -46,9 +44,10 @@ class YOLODetector(
 
         val options = InterpreterApi.Options().apply {
             if (compatList.isDelegateSupportedOnThisDevice) {
-                this.addDelegate(GpuDelegate(GpuDelegateFactory.Options().setForceBackend(GpuDelegateFactory.Options.GpuBackend.OPENCL).setQuantizedModelsAllowed(true).setInferencePreference(0))) // Use GPU if available
+                val delegateOptions = compatList.bestOptionsForThisDevice
+                this.addDelegate(GpuDelegate(delegateOptions)) // Use GPU if available
             } else {
-                this.setNumThreads(Runtime.getRuntime().availableProcessors()) // Use multi-threading on CPU
+                this.setNumThreads(Runtime.getRuntime().availableProcessors()) // if not, use multi-threading on CPU
             }
             Log.d("Delegates", this.delegates.toString())
         }
@@ -99,8 +98,6 @@ class YOLODetector(
             return
         }
 
-        var inferenceTime = SystemClock.uptimeMillis()
-
         val tensorImage = TensorImage(INPUT_IMAGE_TYPE)
         tensorImage.load(ImageHandler().resizeImage(frame, tensorWidth, tensorHeight))
         val processedImage = imageProcessor.process(tensorImage)
@@ -110,14 +107,13 @@ class YOLODetector(
         interpreter.run(imageBuffer, output.buffer)
 
         val bestBoxes = bestBox(output.floatArray)
-        inferenceTime = SystemClock.uptimeMillis() - inferenceTime
 
         if (bestBoxes == null) {
             detectorListener.onEmptyDetect()
             return
         }
 
-        detectorListener.onDetect(bestBoxes, inferenceTime)
+        detectorListener.onDetect(bestBoxes)
     }
 
     private fun bestBox(array: FloatArray) : List<BoundingBox>? {
@@ -203,7 +199,7 @@ class YOLODetector(
 
     interface DetectorListener {
         fun onEmptyDetect()
-        fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long)
+        fun onDetect(boundingBoxes: List<BoundingBox>)
     }
 
     companion object {

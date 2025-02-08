@@ -3,18 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center">
+    android:gravity="center"
+    android:background="@color/background">
 
     <Button
         android:id="@+id/btn_new_recipe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Създай нова рецепта" />
+        android:text="Създай нова рецепта"
+        android:textColor="@color/textColor"/>
 
     <Button
         android:id="@+id/btn_list_recipes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Покажи създадени рецепти" />
+        android:text="Покажи създадени рецепти"
+        android:textColor="@color/textColor"/>
 
 </LinearLayout>

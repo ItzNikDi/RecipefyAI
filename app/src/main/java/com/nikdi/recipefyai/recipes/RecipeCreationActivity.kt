@@ -5,6 +5,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,17 +23,18 @@ class RecipeCreationActivity : AppCompatActivity(), YOLODetector.DetectorListene
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var ingredientAdapter: IngredientAdapter
     private var detectedIngredients = mutableListOf<String>()
+    private lateinit var loadingOverlay: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_creation)
 
         setupRecyclerView()
-
+        loadingOverlay = findViewById(R.id.loadingOverlay)
         val imageUri = intent.getStringExtra("image_uri")?.let { Uri.parse(it) }
 
         if (imageUri != null) {
-            detectedIngredients.add("Processing image, please wait...")
+            showLoading(true)
             ingredientAdapter.notifyDataSetChanged()
 
             coroutineScope.launch(Dispatchers.Default) {
@@ -46,6 +48,12 @@ class RecipeCreationActivity : AppCompatActivity(), YOLODetector.DetectorListene
             // If using text input, initialize an empty list (no detector needed)
             detectedIngredients.clear()
             ingredientAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        runOnUiThread {
+            loadingOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
     }
 
@@ -89,15 +97,23 @@ class RecipeCreationActivity : AppCompatActivity(), YOLODetector.DetectorListene
     }
 
     private fun setupRecyclerView() {
-        ingredientAdapter = IngredientAdapter(detectedIngredients)
+        ingredientAdapter = IngredientAdapter(detectedIngredients) { ingredient ->
+            removeIngredient(ingredient)
+        }
         val recyclerView = findViewById<RecyclerView>(R.id.ingredientRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = ingredientAdapter
     }
 
-    override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
+    private fun removeIngredient(ingredient: String) {
+        detectedIngredients.remove(ingredient)
+        ingredientAdapter.notifyDataSetChanged()
+    }
+
+    override fun onDetect(boundingBoxes: List<BoundingBox>) {
         coroutineScope.launch(Dispatchers.Main) {
             detectedIngredients.clear()
+            showLoading(false)
             detectedIngredients.addAll(boundingBoxes.map { it.clsName })
             ingredientAdapter.notifyDataSetChanged()
         }
@@ -106,6 +122,7 @@ class RecipeCreationActivity : AppCompatActivity(), YOLODetector.DetectorListene
     override fun onEmptyDetect() {
         coroutineScope.launch(Dispatchers.Main){
             detectedIngredients.clear()
+            showLoading(false)
             detectedIngredients.add("No products detected, please add manually!")
             ingredientAdapter.notifyDataSetChanged()
         }

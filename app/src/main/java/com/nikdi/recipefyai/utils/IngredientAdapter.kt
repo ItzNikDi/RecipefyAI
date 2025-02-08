@@ -3,15 +3,19 @@ package com.nikdi.recipefyai.utils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.nikdi.recipefyai.R
 
-class IngredientAdapter(private val ingredientList: List<String>) :
-    RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder>() {
+class IngredientAdapter(
+    private val ingredients: MutableList<String>,
+    private val onRemoveClick: (String) -> Unit
+) : RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder>() {
 
-    class IngredientViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val ingredientText: TextView = itemView.findViewById(R.id.ingredientText)
+    inner class IngredientViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvIngredient: TextView = itemView.findViewById(R.id.ingredientText)
+        val btnRemove: Button = itemView.findViewById(R.id.btnRemove)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IngredientViewHolder {
@@ -21,8 +25,14 @@ class IngredientAdapter(private val ingredientList: List<String>) :
     }
 
     override fun onBindViewHolder(holder: IngredientViewHolder, position: Int) {
-        holder.ingredientText.text = ingredientList[position]
+        val ingredient = ingredients[position]
+        holder.tvIngredient.text = ingredient
+
+        holder.btnRemove.setOnClickListener {
+            onRemoveClick(ingredient) // Call the remove function
+        }
     }
 
-    override fun getItemCount(): Int = ingredientList.size
+    override fun getItemCount(): Int = ingredients.size
 }
+

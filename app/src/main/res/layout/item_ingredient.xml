@@ -1,9 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ingredientText"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
-    android:textSize="16sp"
-    android:textColor="@android:color/black"/>
+    android:orientation="horizontal"
+    android:padding="6dp">
+
+    <TextView
+        android:id="@+id/ingredientText"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="Ingredient Name"
+        android:textSize="20sp"
+        android:textColor="@color/textColor"/>
+
+    <Button
+        android:id="@+id/btnRemove"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textColor="@color/textColor"/>
+</LinearLayout>

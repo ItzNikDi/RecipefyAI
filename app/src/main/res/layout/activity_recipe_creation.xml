@@ -9,16 +9,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/linear_creation_layout">
 
         <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Създайте рецепта"
+            android:text="@string/creation_title"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
-            android:textSize="20sp"
+            android:textSize="32sp"
             android:textStyle="bold"
             android:textColor="@color/textColor"/>
 
@@ -33,12 +34,26 @@
             android:textColor="@color/textColor"
             android:layout_marginHorizontal="12dp"/>
 
+        <EditText
+            android:id="@+id/ingredientInput"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_ingredient"
+            android:textColorHint="@color/textColor"
+            android:minHeight="48dp"
+            android:textSize="32sp"
+            android:maxLines="1"
+            android:padding="8dp"
+            android:textColor="@color/textColor"
+            android:inputType="text" />
+
         <!-- Add Ingredient Button -->
         <Button
             android:id="@+id/addIngredientButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Добавете съставка"
+            android:text="@string/add_ingredient"
             android:layout_marginTop="8dp"
             android:layout_gravity="center"
             android:textColor="@color/textColor"/>
@@ -48,7 +63,7 @@
             android:id="@+id/confirmRecipeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Продължете напред"
+            android:text="@string/proceed_forward"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:layout_gravity="center"
@@ -68,13 +83,14 @@
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="?android:attr/progressBarStyle" />
+            style="?android:attr/progressBarStyle"
+            android:indeterminateDrawable="@drawable/custom_progress"/>
 
         <TextView
             android:id="@+id/loadingText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Моля, изчакайте..."
+            android:text="@string/waiting"
             android:textSize="16sp"
             android:textColor="@color/textColor"
             android:paddingTop="8dp"/>

@@ -41,4 +41,14 @@ object PermissionManager {
     fun checkPermissions(context: Context, requiredPermissions: Array<String>): Boolean {
         return this.arePermissionsGranted(context, requiredPermissions)
     }
+
+    fun onRequestPermissionsResult(requestCode: Int, activity: Activity, proceedToApp: () -> Unit, showSettingsDialog: () -> Unit) {
+        if (requestCode == RequiredPermissions.PERMISSION_REQUEST_CODE) {
+            if (arePermissionsGranted(activity, RequiredPermissions.permissions)) {
+                proceedToApp() // Permissions granted, proceed to app
+            } else {
+                showSettingsDialog() // Permissions denied, show settings dialog
+            }
+        }
+    }
 }

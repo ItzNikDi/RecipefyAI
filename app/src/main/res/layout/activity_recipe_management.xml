@@ -10,14 +10,14 @@
         android:id="@+id/btn_new_recipe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Създай нова рецепта"
+        android:text="@string/create_new_recipe"
         android:textColor="@color/textColor"/>
 
     <Button
         android:id="@+id/btn_list_recipes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Покажи създадени рецепти"
+        android:text="@string/list_old_recipes"
         android:textColor="@color/textColor"/>
 
 </LinearLayout>

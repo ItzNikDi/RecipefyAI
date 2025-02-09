@@ -33,6 +33,13 @@ class IngredientAdapter(
         }
     }
 
+    fun removeDuplicates() {
+        val uniqueIngredients = ingredients.toSet().toList()  // Remove duplicates using Set
+        ingredients.clear()
+        ingredients.addAll(uniqueIngredients)
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int = ingredients.size
 }
 

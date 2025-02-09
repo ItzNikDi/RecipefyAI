@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Recipefy.AI</string>
+    <string name="creation_title">Подбор на съставки</string>
+    <string name="create_new_recipe">Създай нова рецепта</string>
+    <string name="list_old_recipes">Покажи създадени рецепти</string>
+    <string name="enter_ingredient">Въведете съставка</string>
+    <string name="add_ingredient">Добавете съставка</string>
+    <string name="empty_ingredient_text">Моля въведете съставка!</string>
+    <string name="duplicate_ingredient">Тази съставка вече е добавена!</string>
+    <string name="inference_error">Срещнахме грешка :(</string>
+    <string name="no_ingredients_found">Не намерихме никакви продукти, моля добавете ги ръчно!</string>
+    <string name="proceed_forward">Продължете напред</string>
+    <string name="waiting">Моля, изчакайте…</string>
 </resources>

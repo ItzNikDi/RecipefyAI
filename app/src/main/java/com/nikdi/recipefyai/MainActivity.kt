@@ -2,7 +2,6 @@ package com.nikdi.recipefyai
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.nikdi.recipefyai.recipes.RecipeManagementActivity
 import com.nikdi.recipefyai.utils.PermissionManager
@@ -25,10 +24,34 @@ class MainActivity: AppCompatActivity() {
         }
     }
 
-    private fun proceedToApp() {
-        preferenceManager.setFirstRun(false)
-        Toast.makeText(this, "Добре дошли!", Toast.LENGTH_SHORT).show() // TO REMOVE
+    override fun onResume() {
+        super.onResume()
+        if (PermissionManager.checkPermissions(this, RequiredPermissions.permissions)) {
+            proceedToApp()
+        } else {
+            if (!preferenceManager.isFirstRun()) {
+                PermissionManager.showSettingsDialog(this, this)
+            }
+        }
+    }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        PermissionManager.onRequestPermissionsResult(
+            requestCode,
+            this,
+            ::proceedToApp
+        )  // Permissions granted, proceed to app
+        {
+            PermissionManager.showSettingsDialog(this,this)
+        }  // Show settings dialog if permissions denied
+
+    }
+
+
+    private fun proceedToApp() {
+        if (preferenceManager.isFirstRun()) preferenceManager.setFirstRun(false)
         startActivity(Intent(this, RecipeManagementActivity::class.java))
         finish()
     }

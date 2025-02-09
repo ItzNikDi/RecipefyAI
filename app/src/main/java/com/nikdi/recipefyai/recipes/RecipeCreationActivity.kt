@@ -6,12 +6,16 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.Coil
 import coil.request.ImageRequest
+import com.google.android.material.snackbar.Snackbar
 import com.nikdi.recipefyai.R
 import com.nikdi.recipefyai.airel.BoundingBox
 import com.nikdi.recipefyai.airel.YOLODetector
@@ -32,12 +36,12 @@ class RecipeCreationActivity : AppCompatActivity(), YOLODetector.DetectorListene
         setupRecyclerView()
         loadingOverlay = findViewById(R.id.loadingOverlay)
         val imageUri = intent.getStringExtra("image_uri")?.let { Uri.parse(it) }
-
+        
         if (imageUri != null) {
             showLoading(true)
-            ingredientAdapter.notifyDataSetChanged()
 
-            coroutineScope.launch(Dispatchers.Default) {
+            ingredientAdapter.notifyDataSetChanged()
+            coroutineScope.launch(Dispatchers.IO) {
                 var infTime = System.currentTimeMillis()
                 initModel()
                 runInference(imageUri)
@@ -46,8 +50,34 @@ class RecipeCreationActivity : AppCompatActivity(), YOLODetector.DetectorListene
             }
         } else {
             // If using text input, initialize an empty list (no detector needed)
-            detectedIngredients.clear()
             ingredientAdapter.notifyDataSetChanged()
+        }
+
+        val ingredientInput = findViewById<EditText>(R.id.ingredientInput)
+        val addIngredientButton = findViewById<Button>(R.id.addIngredientButton)
+
+        addIngredientButton.setOnClickListener { view ->
+            val newIngredient = ingredientInput.text.toString().trim()
+
+            if (newIngredient.isNotEmpty()) {
+                ingredientAdapter.notifyDataSetChanged()
+                if(detectedIngredients.contains(newIngredient)) { Snackbar.make(view, getString(R.string.duplicate_ingredient), Snackbar.LENGTH_SHORT).show()}
+                else {
+                    detectedIngredients.add(newIngredient)
+                    ingredientAdapter.notifyItemInserted(detectedIngredients.size - 1)
+                    ingredientInput.text.clear()
+                }
+            } else {
+                Snackbar.make(view, getString(R.string.empty_ingredient_text), Snackbar.LENGTH_SHORT).setAnchorView(R.id.addIngredientButton).show()
+            }
+        }
+        ingredientInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                addIngredientButton.performClick()
+                true
+            } else {
+                false
+            }
         }
     }
 
@@ -58,7 +88,7 @@ class RecipeCreationActivity : AppCompatActivity(), YOLODetector.DetectorListene
     }
 
     private suspend fun initModel() {
-        withContext(Dispatchers.Default) { // 🚀 Run on background thread
+        withContext(Dispatchers.IO) { // 🚀 Run on background thread
             yoloDetector = YOLODetector(
                 context = this@RecipeCreationActivity,
                 modelPath = "internet.tflite",
@@ -70,23 +100,21 @@ class RecipeCreationActivity : AppCompatActivity(), YOLODetector.DetectorListene
     }
 
     private suspend fun runInference(uri: Uri) {
-        withContext(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
             val request = ImageRequest.Builder(this@RecipeCreationActivity)
                 .data(uri)
                 .bitmapConfig(Bitmap.Config.ARGB_8888)
                 .target(
                     onSuccess = { result ->
                         (result as? BitmapDrawable)?.bitmap?.let { bitmap ->
-                            coroutineScope.launch(Dispatchers.Default) {
+                            coroutineScope.launch(Dispatchers.IO) {
                                 yoloDetector?.detect(bitmap)
                             }
                         }
                     },
                     onError = {
-                        coroutineScope.launch(Dispatchers.Main) {
-                            detectedIngredients.clear()
-                            detectedIngredients.add("Sorry, could not process image.")
-                            ingredientAdapter.notifyDataSetChanged()
+                        runOnUiThread {
+                            Snackbar.make(findViewById(R.id.linear_creation_layout), getString(R.string.inference_error), Snackbar.LENGTH_SHORT).show()
                         }
                     }
                 )
@@ -112,19 +140,17 @@ class RecipeCreationActivity : AppCompatActivity(), YOLODetector.DetectorListene
 
     override fun onDetect(boundingBoxes: List<BoundingBox>) {
         coroutineScope.launch(Dispatchers.Main) {
-            detectedIngredients.clear()
             showLoading(false)
             detectedIngredients.addAll(boundingBoxes.map { it.clsName })
+            ingredientAdapter.removeDuplicates()
             ingredientAdapter.notifyDataSetChanged()
         }
     }
 
     override fun onEmptyDetect() {
-        coroutineScope.launch(Dispatchers.Main){
-            detectedIngredients.clear()
+        runOnUiThread {
             showLoading(false)
-            detectedIngredients.add("No products detected, please add manually!")
-            ingredientAdapter.notifyDataSetChanged()
+            Snackbar.make(findViewById(R.id.linear_creation_layout), getString(R.string.no_ingredients_found), Snackbar.LENGTH_SHORT).show()
         }
     }
 

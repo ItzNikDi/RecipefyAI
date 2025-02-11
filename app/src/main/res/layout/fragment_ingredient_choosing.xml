@@ -6,11 +6,13 @@
     android:fitsSystemWindows="true"
     android:layout_gravity="center"
     android:background="@color/background">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:id="@+id/linear_creation_layout">
+        android:id="@+id/linear_creation_layout"
+        android:padding="16dp">
 
         <!-- Title -->
         <TextView
@@ -18,10 +20,10 @@
             android:layout_height="wrap_content"
             android:text="@string/creation_title"
             android:layout_gravity="center"
-            android:layout_marginTop="8dp"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:textColor="@color/textColor"/>
+            android:textColor="@color/textColor"
+            android:layout_marginTop="16dp"/>
 
         <!-- Ingredient Listing -->
         <androidx.recyclerview.widget.RecyclerView
@@ -30,22 +32,23 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scrollbars="vertical"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:textColor="@color/textColor"
             android:layout_marginHorizontal="12dp"/>
 
+        <!-- Ingredient Input Field -->
         <EditText
             android:id="@+id/ingredientInput"
             android:layout_gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/enter_ingredient"
             android:textColorHint="@color/textColor"
-            android:minHeight="48dp"
-            android:textSize="32sp"
-            android:maxLines="1"
-            android:padding="8dp"
             android:textColor="@color/textColor"
+            android:textSize="18sp"
+            android:minHeight="48dp"
+            android:maxLines="1"
+            android:padding="12dp"
             android:inputType="text" />
 
         <!-- Add Ingredient Button -->
@@ -54,9 +57,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_ingredient"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:layout_gravity="center"
-            android:textColor="@color/textColor"/>
+            android:textColor="@color/textColor" />
 
         <!-- Confirm Recipe Button -->
         <Button
@@ -64,13 +67,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/proceed_forward"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:layout_gravity="center"
-            android:textColor="@color/textColor"/>
+            android:textColor="@color/textColor" />
 
     </LinearLayout>
 
+    <!-- Loading Overlay -->
     <LinearLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
@@ -84,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?android:attr/progressBarStyle"
-            android:indeterminateDrawable="@drawable/custom_progress"/>
+            android:indeterminateDrawable="@drawable/custom_progress" />
 
         <TextView
             android:id="@+id/loadingText"

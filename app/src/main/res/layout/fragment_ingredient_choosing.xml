@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
     android:layout_gravity="center"
@@ -12,39 +13,51 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/linear_creation_layout"
-        android:padding="16dp">
+        android:padding="20dp">
 
-        <!-- Title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/creation_title"
-            android:layout_gravity="center"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:textColor="@color/textColor"
-            android:layout_marginTop="16dp"/>
-
-        <!-- Ingredient Listing -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/ingredientRecyclerView"
+        <!-- Container for RecyclerView & Empty Message -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:scrollbars="vertical"
-            android:layout_marginTop="16dp"
-            android:textColor="@color/textColor"
-            android:layout_marginHorizontal="12dp"/>
+            android:layout_weight="1">  <!-- Takes up remaining space -->
+
+            <!-- RecyclerView (Fully Expands) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/ingredientRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:textColor="@color/textColor"
+                android:paddingHorizontal="12dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <!-- Empty Message (Overlaid, Hidden Initially) -->
+            <TextView
+                android:id="@+id/emptyMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_added_ingredients"
+                android:textSize="32sp"
+                android:textColor="@color/textColor"
+                android:gravity="center"
+                android:padding="8dp"
+                android:visibility="visible"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Ingredient Input Field -->
         <EditText
             android:id="@+id/ingredientInput"
-            android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/enter_ingredient"
             android:textColorHint="@color/textColor"
             android:textColor="@color/textColor"
+            android:layout_marginTop="12dp"
             android:textSize="18sp"
             android:minHeight="48dp"
             android:maxLines="1"
@@ -59,6 +72,7 @@
             android:text="@string/add_ingredient"
             android:layout_marginTop="12dp"
             android:layout_gravity="center"
+            android:backgroundTint="@color/buttonColor"
             android:textColor="@color/textColor" />
 
         <!-- Confirm Recipe Button -->
@@ -70,6 +84,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:layout_gravity="center"
+            android:backgroundTint="@color/buttonColor"
             android:textColor="@color/textColor" />
 
     </LinearLayout>

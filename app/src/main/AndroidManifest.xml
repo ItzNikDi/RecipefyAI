@@ -26,17 +26,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".recipes.RecipeCreationActivity"
-            android:exported="false"
-            android:theme="@style/Theme.RecipefyAI.NoActionBar">
-        </activity>
-
-        <activity
-            android:name=".recipes.RecipeManagementActivity"
-            android:exported="false"
-            android:theme="@style/Theme.RecipefyAI.NoActionBar">
-        </activity>
     </application>
 </manifest>

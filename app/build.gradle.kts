@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -33,6 +34,9 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        viewBinding = true
+    }
     buildToolsVersion = "36.0.0 rc4"
     ndkVersion = "28.0.12916984 rc3"
 }
@@ -49,6 +53,8 @@ dependencies {
     implementation(libs.litert.gpu.api)
     implementation(libs.litert.metadata)
     implementation(libs.litert.support.api)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

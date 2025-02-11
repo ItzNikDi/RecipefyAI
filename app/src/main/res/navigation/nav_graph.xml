@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/newRecipeFragment">
+
+    <!-- Recipe Management Fragment (main view with the options to choose photo or text) -->
+    <fragment
+        android:id="@+id/newRecipeFragment"
+        android:name="com.nikdi.recipefyai.recipes.NewRecipeFragment"
+        android:label="@string/create_new_recipe"
+        tools:layout="@layout/fragment_new_recipe" >
+
+        <action
+            android:id="@+id/action_newRecipeFragment_to_recipeCreationFragment"
+            app:destination="@id/ingredientChoosingFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/ingredientChoosingFragment"
+        android:name="com.nikdi.recipefyai.recipes.IngredientChoosingFragment"
+        android:label="@string/ingredients_title"
+        tools:layout="@layout/fragment_ingredient_choosing">
+
+        <argument
+            android:name="imageUri"
+            app:argType="string"
+            app:nullable="true" /> <!-- Pass URI as a string -->
+    </fragment>
+</navigation>

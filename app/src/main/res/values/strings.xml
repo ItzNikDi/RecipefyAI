@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">Recipefy.AI</string>
-    <string name="creation_title">Подбор на съставки</string>
+    <string name="choose_method">От какво бихте желали да подберете продуктите?</string>
+    <string name="from_photo">От снимка</string>
+    <string name="from_text">От текст</string>
+    <string name="ingredients_title">Подбор на съставки</string>
     <string name="create_new_recipe">Създай нова рецепта</string>
     <string name="list_old_recipes">Покажи създадени рецепти</string>
+    <string name="no_added_ingredients">Няма добавени съставки</string>
     <string name="enter_ingredient">Въведете съставка</string>
     <string name="add_ingredient">Добавете съставка</string>
     <string name="empty_ingredient_text">Моля въведете съставка!</string>

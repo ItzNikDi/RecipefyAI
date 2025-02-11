@@ -3,4 +3,6 @@
     <color name="background">#121212</color>
     <color name="textColor">#FFFFFF</color>
     <color name="buttonColor">#BB86FC</color>
+    <color name="toolbarColor">#00BCD4</color>
+    <color name="overlayColor">#191919</color>
 </resources>

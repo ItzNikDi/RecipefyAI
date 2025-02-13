@@ -14,12 +14,12 @@
 
         <action
             android:id="@+id/action_newRecipeFragment_to_recipeCreationFragment"
-            app:destination="@id/ingredientChoosingFragment" />
+            app:destination="@id/ingredientChoiceFragment" />
 
     </fragment>
 
     <fragment
-        android:id="@+id/ingredientChoosingFragment"
+        android:id="@+id/ingredientChoiceFragment"
         android:name="com.nikdi.recipefyai.recipes.IngredientChoosingFragment"
         android:label="@string/ingredients_title"
         tools:layout="@layout/fragment_ingredient_choosing">
@@ -27,6 +27,28 @@
         <argument
             android:name="imageUri"
             app:argType="string"
-            app:nullable="true" /> <!-- Pass URI as a string -->
+            app:nullable="true" />
+        <!-- Pass URI as a string -->
+        <action
+            android:id="@+id/action_ingredientChoiceFragment_to_temporaryRecipeFragment"
+            app:destination="@id/temporaryRecipeFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/temporaryRecipeFragment"
+        android:name="com.nikdi.recipefyai.recipes.TemporaryRecipeFragment"
+        android:label="@string/cooking_title"
+        tools:layout="@layout/fragment_temporary_recipe">
+
+            <argument
+                android:name="ingredients"
+                app:argType="string[]" />
+
+            <argument
+                android:name="servings"
+                app:argType="integer" />
+            <argument
+                android:name="units"
+                app:argType="string" />
     </fragment>
 </navigation>

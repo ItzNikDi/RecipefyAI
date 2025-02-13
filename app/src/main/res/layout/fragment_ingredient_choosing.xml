@@ -77,10 +77,10 @@
 
         <!-- Confirm Recipe Button -->
         <Button
-            android:id="@+id/confirmRecipeButton"
+            android:id="@+id/confirmIngredientsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/proceed_forward"
+            android:text="@string/proceed"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:layout_gravity="center"

@@ -13,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.nikdi.recipefyai.databinding.FragmentNewRecipeBinding
-import com.nikdi.recipefyai.R
 
 class NewRecipeFragment : Fragment() {
     private var _binding: FragmentNewRecipeBinding? = null

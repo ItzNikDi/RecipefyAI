@@ -31,8 +31,11 @@ class IngredientAdapter(
     }
 
     fun removeIngredient(position: Int) {
-        ingredients.removeAt(position)
-        notifyItemRemoved(position)
+        if (position in ingredients.indices) {
+            ingredients.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, ingredients.size)
+        }
     }
 
     fun removeDuplicates() {

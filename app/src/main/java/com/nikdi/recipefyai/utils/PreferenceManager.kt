@@ -4,13 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class PreferenceManager(context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("PermissionPrefs", Context.MODE_PRIVATE)
 
     fun isFirstRun(): Boolean {
-        return prefs.getBoolean("isFirstRun", true)
+        return sharedPreferences.getBoolean("is_first_run", true)
     }
 
     fun setFirstRun(isFirstRun: Boolean) {
-        prefs.edit().putBoolean("isFirstRun", isFirstRun).apply()
+        sharedPreferences.edit().putBoolean("is_first_run", isFirstRun).apply()
     }
 }

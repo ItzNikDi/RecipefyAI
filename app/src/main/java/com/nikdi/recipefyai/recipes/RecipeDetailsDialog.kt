@@ -5,10 +5,8 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.nikdi.recipefyai.databinding.DialogRecipeDetailsBinding
 import com.nikdi.recipefyai.R
 
@@ -18,7 +16,8 @@ class RecipeDetailsDialog() : DialogFragment() {
     private val binding get() = _binding!!
 
     interface RecipeDetailsListener {
-        fun onDetailsEntered(servings: String, units: String)
+        fun onProceed(servings: String, portionSize: String)
+        fun onCancel(servings: String, portionSize: String)
     }
 
     private var listener: RecipeDetailsListener? = null
@@ -36,51 +35,46 @@ class RecipeDetailsDialog() : DialogFragment() {
         _binding = DialogRecipeDetailsBinding.inflate(layoutInflater)
 
         val previousServings = arguments?.getString("servings") ?: ""
-        val previousUnit = arguments?.getString("unit") ?: ""
+        val previousPortionSize = arguments?.getString("portionSize") ?: ""
 
         binding.servingsInput.setText(previousServings)
-
-        val unitOptions = resources.getStringArray(R.array.measurement_systems)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, unitOptions)
-        binding.unitsSpinner.adapter = adapter
-
-        if (previousUnit.isNotEmpty()) {
-            val position = unitOptions.indexOf(previousUnit)
-            if (position != -1) {
-                binding.unitsSpinner.setSelection(position)
-            }
-        }
-
-
-        // Validate input before enabling the proceed button
-        fun validateInputs() {
-            val servingsText = binding.servingsInput.text.toString()
-            val unitSelected = binding.unitsSpinner.selectedItem?.toString()?.isNotEmpty() == true
-            binding.btnProceed.isEnabled = servingsText.isNotEmpty() && unitSelected
-        }
-
-        binding.servingsInput.addTextChangedListener { validateInputs() }
-        binding.unitsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                validateInputs()
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
+        binding.portionSizeInput.setText(previousPortionSize)
 
         val dialog = AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.details_title))
             .setView(binding.root)
-            .setNegativeButton(getString(R.string.cancel)) { d, _ -> d.dismiss() }
             .create()
 
-        binding.btnProceed.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             val servings = binding.servingsInput.text.toString()
-            val unit = binding.unitsSpinner.selectedItem.toString()
-            listener?.onDetailsEntered(servings, unit)
+            val portionSize = binding.portionSizeInput.text.toString()
+            listener?.onCancel(servings, portionSize)
             dismiss()
         }
 
+        binding.btnProceed.setOnClickListener { view ->
+            val servings = binding.servingsInput.text.toString()
+            val portionSize = binding.portionSizeInput.text.toString()
+            if (validateInputs(view, servings, portionSize)) {
+                listener?.onProceed(servings, portionSize)
+                dismiss()
+            }
+        }
+
         return dialog
+    }
+
+    private fun validateInputs(view: View, servings: String, portionSize: String): Boolean {
+        if (servings.isEmpty() || servings.toInt() <= 0) {
+            Snackbar.make(view, getString(R.string.servings_empty), Snackbar.LENGTH_SHORT)
+                .setAnchorView(R.id.btnProceed)
+                .show()
+            return false
+        } else if (portionSize.isEmpty() || portionSize.toFloat() <= 0) {
+            Snackbar.make(view, getString(R.string.portion_size_empty), Snackbar.LENGTH_SHORT)
+                .setAnchorView(R.id.btnProceed)
+                .show()
+            return false
+        } else return true
     }
 
     override fun onDestroyView() {
@@ -89,13 +83,13 @@ class RecipeDetailsDialog() : DialogFragment() {
     }
 
     companion object {
-        fun newInstance(servings: String?, units: String?): RecipeDetailsDialog {
-            val dialog = RecipeDetailsDialog()
-            val args = Bundle()
-            args.putString("servings", servings)
-            args.putString("unit", units)
-            dialog.arguments = args
-            return dialog
+        fun newInstance(servings: String?, portionSize: String?): RecipeDetailsDialog {
+            return RecipeDetailsDialog().apply {
+                arguments = Bundle().apply {
+                    putString("servings", servings)
+                    putString("portionSize", portionSize)
+                }
+            }
         }
     }
 }

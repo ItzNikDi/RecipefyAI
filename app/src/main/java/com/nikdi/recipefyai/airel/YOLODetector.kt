@@ -49,7 +49,7 @@ class YOLODetector(
             } else {
                 this.setNumThreads(Runtime.getRuntime().availableProcessors()) // if not, use multi-threading on CPU
             }
-            Log.d("Delegates", this.delegates.toString())
+            Log.d("Delegates", this.delegates.toString()) // TODO take a look at the delegate implementation
         }
 
         val model = FileUtil.loadMappedFile(context, modelPath)

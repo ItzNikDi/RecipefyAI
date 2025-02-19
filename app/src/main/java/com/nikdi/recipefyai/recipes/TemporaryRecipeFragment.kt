@@ -1,20 +1,32 @@
 package com.nikdi.recipefyai.recipes
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.google.gson.Gson
+import com.nikdi.recipefyai.R
+import com.nikdi.recipefyai.apirel.RecipeRequest
+import com.nikdi.recipefyai.apirel.RecipeResponse
+import com.nikdi.recipefyai.apirel.RetrofitClient
 import com.nikdi.recipefyai.databinding.FragmentTemporaryRecipeBinding
-import org.json.JSONArray
-import org.json.JSONObject
+import io.noties.markwon.Markwon
+import kotlinx.coroutines.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class TemporaryRecipeFragment : Fragment() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var _binding: FragmentTemporaryRecipeBinding? = null
     private val binding get() = _binding!!
-    val args: TemporaryRecipeFragmentArgs by navArgs()
+    private val args: TemporaryRecipeFragmentArgs by navArgs()
     private lateinit var loadingOverlay: View
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -26,44 +38,66 @@ class TemporaryRecipeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         loadingOverlay = binding.loadingOverlay
+        Log.d("Loaded", args.ingredients.toList().toString())
+        Log.d("Loaded", args.servings.toString())
+        Log.d("Loaded", args.servings.toString())
+        showLoading(true)
+        val recipeRequest = RecipeRequest(args.ingredients.toList(), args.servings, args.servings.toString())
 
-        val recipeJson = createRecipeJson(args.ingredients.toList(), args.servings, args.units)
+        sendRecipeToServer(recipeRequest)
 
-        sendRecipeToServer(recipeJson)
+        binding.btnSaveRecipe.setOnClickListener { saveRecipe(recipeRequest) }
+        binding.btnRegenRecipe.setOnClickListener { sendRecipeToServer(recipeRequest) }
 
-        binding.btnSaveRecipe.setOnClickListener { saveRecipe(recipeJson) }
-        binding.btnRecreateRecipe.setOnClickListener { sendRecipeToServer(recipeJson) }
+        binding.vertScrollView.isSmoothScrollingEnabled = true
+        binding.textViewOutput.setHorizontallyScrolling(true)
     }
 
-    private fun createRecipeJson(ingredients: List<String>, servings: Int, units: String): String {
-        val jsonObject = JSONObject().apply {
-            put("ingredients", JSONArray(ingredients))
-            put("servings", servings)
-            put("units", units)
-        }
-        return jsonObject.toString()
-    }
+    private fun sendRecipeToServer(recipeRequest: RecipeRequest) {
+        showLoading(true)  // Show loading overlay
+        binding.btnRegenRecipe.isEnabled = false  // Disable button to prevent spam requests
 
-    private fun sendRecipeToServer(jsonData: String) {
-        binding.textViewOutput.text = "Generating your recipe..." // Placeholder text
+        RetrofitClient.apiService.generateRecipe(recipeRequest).enqueue(object : Callback<RecipeResponse> {
+            override fun onResponse(call: Call<RecipeResponse>, response: Response<RecipeResponse>) {
+                showLoading(false)  // Hide loading
+                binding.btnRegenRecipe.isEnabled = true  // Re-enable button
 
-        // Use Volley or Retrofit to send request
-        val url = "http://your-flask-server.com/generate_recipe"
-        val request = JsonObjectRequest(
-            Request.Method.POST, url, JSONObject(jsonData),
-            { response ->
-                // Handle server response
-                val markdownText = response.getString("recipe_text")
-                displayMarkdown(markdownText)
-            },
-            { error ->
-                binding.textViewOutput.text = "Error fetching recipe."
-                Log.e("API_ERROR", "Error: ${error.message}")
+                if (response.isSuccessful && response.body() != null) {
+                    val markdownResponse = response.body()!!.markdown
+                    val userId = response.body()!!.uuid
+                    Log.d("RecipeResponse", markdownResponse)
+                    Log.d("RecipeResponse", userId)
+
+                    response.body()?.let {
+                        displayMarkdown(it.markdown)
+                    }
+                } else {
+                    binding.textViewOutput.text = String.format("${getString(R.string.network_error)} ${response.errorBody()?.string()}")
+                }
             }
-        )
 
-        // Add request to queue
-        Volley.newRequestQueue(requireContext()).add(request)
+            override fun onFailure(call: Call<RecipeResponse>, t: Throwable) {
+                showLoading(false)  // Hide loading
+                binding.btnRegenRecipe.isEnabled = true  // Re-enable button
+                Log.e("RecipeError", "${t.message}")
+                binding.textViewOutput.text = getString(R.string.network_error)
+            }
+        })
+    }
+
+
+    private fun showLoading(isLoading: Boolean) {
+        loadingOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    private fun displayMarkdown(markdownText: String) {
+        val markdownView = Markwon.create(requireContext())
+        markdownView.setMarkdown(binding.textViewOutput, markdownText)
+    }
+
+    private fun saveRecipe(recipeRequest: RecipeRequest) {
+        val json = Gson().toJson(recipeRequest)
+        Toast.makeText(requireContext(), "Recipe saved!", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/choose_method"
-            android:textSize="24sp"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Large"
             android:layout_marginTop="90dp"
             android:textColor="@color/textColor"
             android:gravity="center"
@@ -31,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/from_photo"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
             android:textColor="@color/textColor"
             android:backgroundTint="@color/buttonColor"
             android:layout_marginBottom="16dp" />
@@ -40,6 +41,7 @@
             android:id="@+id/btnFromText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
             android:backgroundTint="@color/buttonColor"
             android:text="@string/from_text"
             android:textColor="@color/textColor" />

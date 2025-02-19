@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
     android:layout_gravity="center"
@@ -38,11 +38,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/no_added_ingredients"
-                android:textSize="32sp"
+                android:textAppearance="@style/TextAppearance.RecipefyAI.Large"
                 android:textColor="@color/textColor"
                 android:gravity="center"
                 android:padding="8dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="20dp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +58,7 @@
             android:textColorHint="@color/textColor"
             android:textColor="@color/textColor"
             android:layout_marginTop="12dp"
-            android:textSize="18sp"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
             android:minHeight="48dp"
             android:maxLines="1"
             android:padding="12dp"
@@ -70,6 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_ingredient"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
             android:layout_marginTop="12dp"
             android:layout_gravity="center"
             android:backgroundTint="@color/buttonColor"
@@ -81,6 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/proceed"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:layout_gravity="center"
@@ -97,7 +99,9 @@
         android:background="#80000000"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
 
         <ProgressBar
             android:layout_width="wrap_content"
@@ -106,11 +110,10 @@
             android:indeterminateDrawable="@drawable/custom_progress" />
 
         <TextView
-            android:id="@+id/loadingText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/waiting"
-            android:textSize="16sp"
+            android:text="@string/inference_wait"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
             android:textColor="@color/textColor"
             android:paddingTop="8dp"/>
     </LinearLayout>

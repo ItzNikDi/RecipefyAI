@@ -1,5 +1,6 @@
 package com.nikdi.recipefyai.recipes
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
@@ -32,10 +33,10 @@ class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, Re
     private var yoloDetector: YOLODetector? = null
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var ingredientAdapter: IngredientAdapter
-    private var detectedIngredients = mutableListOf<String>()
+    private var ingredientsList = mutableListOf<String>()
     private lateinit var loadingOverlay: View
     private var selectedServings: String? = null
-    private var selectedUnits: String? = null
+    private var selectedPortionSize: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -49,42 +50,48 @@ class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, Re
 
         setupRecyclerView()
 
-        loadingOverlay = binding.loadingOverlay // Use binding to access the overlay
-        val imageUriString = args.imageUri
+        ingredientsList.clear()
+        ingredientsList.addAll(loadIngredients(requireContext()))
 
-        val imageUri = if (!imageUriString.isNullOrEmpty()) {
-            Uri.parse(imageUriString)
-        } else {
-            null
-        }
+        ingredientAdapter.notifyDataSetChanged()
+
+        binding.root.post { updateEmptyOverlay() }
+
+        loadingOverlay = binding.loadingOverlay // Use binding to access the overlay
+
+        val imageUriString = args.imageUri
+        val imageUri = imageUriString?.takeIf { it.isNotEmpty() }?.let { Uri.parse(it) }
 
         if (imageUri != null) {
-            showLoading(true)
-
-            ingredientAdapter.notifyDataSetChanged()
             coroutineScope.launch(Dispatchers.IO) {
-                var infTime = System.currentTimeMillis()
+                showLoading(true)
                 initModel()
                 runInference(imageUri)
-                infTime = System.currentTimeMillis() - infTime
-                Log.d("InfTime", infTime.toString())
             }
-        } else {
-            ingredientAdapter.notifyDataSetChanged() // No image, so just show an empty list
         }
 
         // Set up the add ingredient button click listener
-        binding.addIngredientButton.setOnClickListener { view ->
-            val newIngredient = binding.ingredientInput.text.toString().trim()
-            if (newIngredient.isNotEmpty()) {
-                ingredientAdapter.notifyDataSetChanged()
-                if (detectedIngredients.contains(newIngredient)) {
-                    Snackbar.make(view, getString(R.string.duplicate_ingredient), Snackbar.LENGTH_SHORT).show()
+        binding.addIngredientButton.setOnClickListener {
+            val newIngredients = binding.ingredientInput.text.toString()
+                .split(",")
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+            if (newIngredients.isNotEmpty()) {
+                var added = false
+                for (ingredient in newIngredients) {
+                    if (!ingredientsList.contains(ingredient)) {
+                        ingredientsList.add(ingredient)
+                        added = true
+                    }
+                }
+
+                if (added) {
+                    binding.ingredientInput.text.clear()
+                    ingredientAdapter.notifyDataSetChanged()
+                    updateEmptyOverlay()
                 } else {
-                    detectedIngredients.add(newIngredient)
-                    ingredientAdapter.notifyItemInserted(detectedIngredients.size - 1)
-                    binding.ingredientInput.text.clear() // Clear input field after adding
-                    updateEmptyOverlay(getString(R.string.no_added_ingredients))
+                    Snackbar.make(view, getString(R.string.duplicate_ingredient), Snackbar.LENGTH_SHORT)
+                        .setAnchorView(R.id.addIngredientButton).show()
                 }
             } else {
                 Snackbar.make(view, getString(R.string.empty_ingredient_text), Snackbar.LENGTH_SHORT)
@@ -103,26 +110,54 @@ class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, Re
         }
 
         binding.confirmIngredientsButton.setOnClickListener {
-            val dialog = RecipeDetailsDialog.newInstance(selectedServings, selectedUnits)
-            dialog.show(childFragmentManager, "RecipeDetailsDialog")
+            if (ingredientsList.isNotEmpty()) {
+                showDetailsDialog()
+            } else {
+                Snackbar.make(view, getString(R.string.no_added_ingredients), Snackbar.LENGTH_SHORT)
+                    .setAnchorView(R.id.confirmIngredientsButton).show()
+            }
         }
     }
 
-    private fun updateEmptyOverlay(message: String) {
-        if (detectedIngredients.isEmpty()) {
-            binding.emptyMessage.text = message
-            binding.emptyMessage.animate().alpha(1f).setDuration(100).withStartAction {
+    private fun updateEmptyOverlay(message: String = getString(R.string.no_added_ingredients)) {
+        if (ingredientsList.isEmpty()) {
+            if (binding.emptyMessage.visibility != View.VISIBLE) {
+                binding.emptyMessage.text = message
+                binding.emptyMessage.alpha = 0f
                 binding.emptyMessage.visibility = View.VISIBLE
-            }.start()// Fade in
+                binding.emptyMessage.animate().cancel() // Cancel ongoing animations
+                binding.emptyMessage.animate().alpha(1f).setDuration(150).start() // Fade in
+            }
         } else {
-            binding.emptyMessage.animate().alpha(0f).setDuration(100).withEndAction {
-                binding.emptyMessage.visibility = View.GONE
-            }.start() // Fade out
+            if (binding.emptyMessage.visibility == View.VISIBLE) {
+                binding.emptyMessage.animate().cancel()
+                binding.emptyMessage.animate().alpha(0f).setDuration(150).withEndAction {
+                    binding.emptyMessage.visibility = View.GONE
+                }.start() // Fade out
+            }
         }
     }
+
 
     private fun showLoading(isLoading: Boolean) {
         binding.loadingOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    private fun showDetailsDialog() {
+        val dialog = RecipeDetailsDialog.newInstance(selectedServings, selectedPortionSize)
+        dialog.show(childFragmentManager, "RecipeDetailsDialog")
+    }
+
+    private fun saveIngredients(ingredients: List<String>, context: Context) {
+        val sharedPreferences = context.getSharedPreferences("IngredientPrefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit()
+            .putStringSet("ingredients", ingredients.toSet())
+            .apply()
+    }
+
+    private fun loadIngredients(context: Context): List<String> {
+        val sharedPreferences = context.getSharedPreferences("IngredientPrefs", Context.MODE_PRIVATE)
+        return sharedPreferences.getStringSet("ingredients", emptySet())?.toList() ?: emptyList()
     }
 
     private suspend fun initModel() {
@@ -146,11 +181,22 @@ class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, Re
                     onSuccess = { result ->
                         (result as? BitmapDrawable)?.bitmap?.let { bitmap ->
                             coroutineScope.launch(Dispatchers.IO) {
-                                yoloDetector?.detect(bitmap)
+                                try {
+                                    yoloDetector?.detect(bitmap)
+                                    withContext(Dispatchers.Main) {
+                                        showLoading(false) // Hide loading after inference is done
+                                    }
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        showLoading(false) // Ensure it hides even if an error occurs
+                                        Snackbar.make(binding.root, getString(R.string.inference_error), Snackbar.LENGTH_SHORT).show()
+                                    }
+                                }
                             }
                         }
                     },
                     onError = {
+                        showLoading(false) // Hide loading if an error happens
                         Snackbar.make(binding.root, getString(R.string.inference_error), Snackbar.LENGTH_SHORT).show()
                     }
                 )
@@ -160,39 +206,48 @@ class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, Re
         }
     }
 
+
     private fun setupRecyclerView() {
-        ingredientAdapter = IngredientAdapter(detectedIngredients) { position -> ingredientAdapter.removeIngredient(position); this.updateEmptyOverlay(getString(R.string.no_added_ingredients)) }
+        ingredientAdapter = IngredientAdapter(ingredientsList) { position -> ingredientAdapter.removeIngredient(position); updateEmptyOverlay() }
         binding.ingredientRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.ingredientRecyclerView.adapter = ingredientAdapter
     }
 
     override fun onDetect(boundingBoxes: List<BoundingBox>) {
         coroutineScope.launch(Dispatchers.Main) {
-            showLoading(false)
-            detectedIngredients.addAll(boundingBoxes.map { it.clsName })
+            ingredientsList.addAll(boundingBoxes.map { it.clsName })
             ingredientAdapter.removeDuplicates() // Handle duplicates if necessary
             ingredientAdapter.notifyDataSetChanged()
-            updateEmptyOverlay(getString(R.string.no_ingredients_found))
+            updateEmptyOverlay()
         }
     }
 
     override fun onEmptyDetect() {
         coroutineScope.launch(Dispatchers.Main) {
-            showLoading(false)
             updateEmptyOverlay(getString(R.string.no_ingredients_found))
         }
     }
 
-    override fun onDetailsEntered(servings: String, units: String) {
+    override fun onCancel(servings: String, portionSize: String) {
         selectedServings = servings
-        selectedUnits = units
+        selectedPortionSize = portionSize
+    }
+
+    override fun onProceed(servings: String, portionSize: String) {
+        selectedServings = servings
+        selectedPortionSize = portionSize
 
         val action = IngredientChoosingFragmentDirections
             .actionIngredientChoiceFragmentToTemporaryRecipeFragment(
-                detectedIngredients.toTypedArray(),
+                ingredientsList.toTypedArray(),
                 servings.toInt(),
-                units)
+                portionSize.toFloat())
         findNavController().navigate(action)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveIngredients(ingredientsList, requireContext())
     }
 
     override fun onDestroyView() {
@@ -200,7 +255,5 @@ class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, Re
         _binding = null
         yoloDetector?.close()
         coroutineScope.cancel()
-        selectedServings = null
-        selectedUnits = null
     }
 }

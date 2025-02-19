@@ -2,7 +2,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="6dp">
+    android:padding="6dp"
+    android:gravity="center_vertical">
 
     <TextView
         android:id="@+id/ingredientText"
@@ -10,15 +11,14 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textSize="32sp"
+        android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
         android:textColor="@color/textColor"/>
-
-    <!-- TODO set - or X as an icon -->
 
     <ImageButton
         android:id="@+id/btnRemove"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_gravity="center_vertical"
         android:backgroundTint="@color/buttonColor"
         android:src="@drawable/ic_remove"
         android:iconTint="@color/textColor"

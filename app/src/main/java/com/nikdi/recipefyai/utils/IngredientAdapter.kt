@@ -39,11 +39,14 @@ class IngredientAdapter(
     }
 
     fun removeDuplicates() {
-        ingredients.distinct().let {
+        val uniqueIngredients = ingredients.distinct().toMutableList()
+        if (ingredients.size != uniqueIngredients.size) {
             ingredients.clear()
-            ingredients.addAll(it)
+            ingredients.addAll(uniqueIngredients)
+            notifyDataSetChanged() // 🔥 Notify adapter of the full update
         }
     }
+
 
     override fun getItemCount(): Int = ingredients.size
 }

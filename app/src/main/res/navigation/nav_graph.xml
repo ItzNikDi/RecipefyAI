@@ -48,7 +48,8 @@
                 android:name="servings"
                 app:argType="integer" />
             <argument
-                android:name="units"
-                app:argType="string" />
+                android:name="portionSize"
+                app:argType="float" />
+
     </fragment>
 </navigation>

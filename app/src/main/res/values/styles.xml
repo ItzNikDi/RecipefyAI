@@ -1,0 +1,14 @@
+<resources>
+    <style name="TextAppearance.RecipefyAI.Normal" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMinTextSize">24sp</item>
+        <item name="android:autoSizeMaxTextSize">72sp</item>
+        <item name="android:autoSizeStepGranularity">4sp</item>
+    </style>
+    <style name="TextAppearance.RecipefyAI.Large" parent="TextAppearance.AppCompat.Large">
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMinTextSize">32sp</item>
+        <item name="android:autoSizeMaxTextSize">96sp</item>
+        <item name="android:autoSizeStepGranularity">8sp</item>
+    </style>
+</resources>

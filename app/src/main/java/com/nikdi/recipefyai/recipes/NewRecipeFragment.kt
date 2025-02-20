@@ -2,7 +2,6 @@ package com.nikdi.recipefyai.recipes
 
 import android.app.Activity
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,6 +12,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.nikdi.recipefyai.MainActivity
+import com.nikdi.recipefyai.R
 import com.nikdi.recipefyai.databinding.FragmentNewRecipeBinding
 
 class NewRecipeFragment : Fragment() {
@@ -24,6 +25,7 @@ class NewRecipeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
+        (activity as MainActivity).setUpActionBarForFragment(this)
         _binding = FragmentNewRecipeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -40,7 +42,7 @@ class NewRecipeFragment : Fragment() {
         // Button: Create Recipe from Text
         binding.btnFromText.setOnClickListener {
             // Navigate to a fragment that handles text-based recipe creation
-            val action = NewRecipeFragmentDirections.actionNewRecipeFragmentToRecipeCreationFragment(null)
+            val action = NewRecipeFragmentDirections.actionNewRecipeFragmentToIngredientSelectionFragment(null)
             findNavController().navigate(action)
         }
 
@@ -51,7 +53,7 @@ class NewRecipeFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val imageUri: Uri? = result.data?.data
                 if (imageUri != null) {
-                    val action = NewRecipeFragmentDirections.actionNewRecipeFragmentToRecipeCreationFragment(imageUri.toString())
+                    val action = NewRecipeFragmentDirections.actionNewRecipeFragmentToIngredientSelectionFragment(imageUri.toString())
                     findNavController().navigate(action)
                 }
             }

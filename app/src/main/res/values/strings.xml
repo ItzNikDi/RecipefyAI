@@ -3,6 +3,9 @@
     <string name="proceed">Продължете напред</string>
     <string name="enter_hint">въведи</string>
     <string name="cancel">Откажи</string>
+    <string name="new_recipe">Нова рецепта</string>
+    <string name="open_sidebar">Отвори менюто с рецепти</string>
+    <string name="close_sidebar">Затвори менюто с рецепти</string>
     <string name="inference_wait">Разпознаваме вашите продукти…</string>
     <string name="server_response_wait">Създаваме вашата рецепта…</string>
     <string name="network_error">Мрежова грешка. Моля, опитайте отново!</string>
@@ -29,4 +32,7 @@
     <string name="portion_size_empty">Моля въведете размер на порцията!</string>
     <string name="regenerate_recipe">Създай друга рецепта</string>
     <string name="save_recipe">Запази рецептата</string>
+    <string name="invalid_recipe">Не можем да запазим тази рецепта!</string>
+    <string name="unnamed_recipe">Неименована рецепта</string>
+    <string name="display_recipes">Рецепти</string>
 </resources>

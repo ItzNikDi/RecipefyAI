@@ -1,10 +1,13 @@
 package com.nikdi.recipefyai.dbrel
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
-class RecipeSQLiteHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
+class RecipeSQLiteHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
         private const val DATABASE_NAME = "recipeDatabase.db"
@@ -16,19 +19,23 @@ class RecipeSQLiteHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         const val COLUMN_SERVINGS = "servings"
         const val COLUMN_PORTION_SIZE = "portion_size"
         const val COLUMN_PREPARATION = "preparation"
+        const val COLUMN_CREATED = "created_at"
+        const val COLUMN_EDITED = "edited_at"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         val createTable = """
-            CREATE TABLE $TABLE_RECIPES (
-                $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COLUMN_NAME TEXT,
-                $COLUMN_INGREDIENTS TEXT,
-                $COLUMN_SERVINGS INTEGER,
-                $COLUMN_PORTION_SIZE REAL,
-                $COLUMN_PREPARATION TEXT
-            )
-        """
+        CREATE TABLE $TABLE_RECIPES (
+            $COLUMN_ID TEXT PRIMARY KEY,
+            $COLUMN_NAME TEXT NOT NULL,
+            $COLUMN_INGREDIENTS TEXT NOT NULL,
+            $COLUMN_SERVINGS INTEGER NOT NULL,
+            $COLUMN_PORTION_SIZE REAL NOT NULL,
+            $COLUMN_PREPARATION TEXT NOT NULL,
+            $COLUMN_CREATED INTEGER NOT NULL,
+            $COLUMN_EDITED INTEGER NOT NULL
+        )
+    """.trimIndent()
         db.execSQL(createTable)
     }
 
@@ -37,48 +44,74 @@ class RecipeSQLiteHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         onCreate(db)
     }
 
-    fun saveRecipe(name: String, ingredients: String, servings: Int, portionSize: Float, preparation: String) {
+    fun saveRecipe(recipe: Recipe) {
         val db = writableDatabase
-        val insertQuery = """
-            INSERT INTO $TABLE_RECIPES ($COLUMN_NAME, $COLUMN_INGREDIENTS, $COLUMN_SERVINGS, $COLUMN_PORTION_SIZE, $COLUMN_PREPARATION) 
-            VALUES ('$name', '$ingredients', $servings, $portionSize, '$preparation')
-        """
-        db.execSQL(insertQuery)
+        val values = ContentValues().apply {
+            put(COLUMN_ID, recipe.id)
+            put(COLUMN_NAME, recipe.name)
+            put(COLUMN_INGREDIENTS, Gson().toJson(recipe.ingredients)) // Convert list to JSON
+            put(COLUMN_SERVINGS, recipe.servings)
+            put(COLUMN_PORTION_SIZE, recipe.portionSize)
+            put(COLUMN_PREPARATION, recipe.preparation)
+            put(COLUMN_CREATED, recipe.createdAt)
+            put(COLUMN_EDITED, recipe.editedAt)
+        }
+        db.insert(TABLE_RECIPES, null, values)
         db.close()
     }
 
-    fun getAllRecipes(): List<Recipe> {
+    fun getAllRecipeNamesSorted(): List<RecipeSummary> {
+        val recipes = mutableListOf<RecipeSummary>()
         val db = readableDatabase
-        val selectQuery = "SELECT * FROM $TABLE_RECIPES"
-        val cursor = db.rawQuery(selectQuery, null)
+        val cursor = db.query(
+            TABLE_RECIPES, arrayOf(COLUMN_ID, COLUMN_NAME),
+            null, null, null, null, "$COLUMN_EDITED DESC"
+        )
 
-        val recipes = mutableListOf<Recipe>()
-        if (cursor.moveToFirst()) {
-            do {
-                // Checking column indexes to ensure they are valid
-                val idIndex = cursor.getColumnIndex(COLUMN_ID)
-                val nameIndex = cursor.getColumnIndex(COLUMN_NAME)
-                val ingredientsIndex = cursor.getColumnIndex(COLUMN_INGREDIENTS)
-                val servingsIndex = cursor.getColumnIndex(COLUMN_SERVINGS)
-                val portionSizeIndex = cursor.getColumnIndex(COLUMN_PORTION_SIZE)
-                val preparationIndex = cursor.getColumnIndex(COLUMN_PREPARATION)
-
-                // Extract data from the valid columns
-                val id = cursor.getInt(idIndex)
-                val name = cursor.getString(nameIndex)
-                val ingredients = cursor.getString(ingredientsIndex)
-                val servings = cursor.getInt(servingsIndex)
-                val portionSize = cursor.getFloat(portionSizeIndex)
-                val preparation = cursor.getString(preparationIndex)
-
-                // Create the Recipe object
-                val recipe = Recipe(id, name, ingredients, servings, portionSize, preparation)
-                recipes.add(recipe)
-            } while (cursor.moveToNext())
+        while (cursor.moveToNext()) {
+            val id = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID))
+            val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME))
+            recipes.add(RecipeSummary(id = id, name = name))
         }
+
+        cursor.close()
+        db.close()
+        return recipes
+    }
+
+    fun getRecipeById(recipeId: String): Recipe {
+        val db = readableDatabase
+        var recipe: Recipe? = null
+
+        val cursor = db.query(
+            TABLE_RECIPES, null, // Select all columns from the recipes table
+            "$COLUMN_ID = ?", // WHERE condition
+            arrayOf(recipeId), // Bind the recipeId as the selection argument
+            null, null, null
+        )
+
+        if (cursor.moveToFirst()) {
+            // Extract values from cursor and create a Recipe object
+            val id = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID))
+            val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME))
+            val ingredientsJson = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_INGREDIENTS))
+            val servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS))
+            val portionSize = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_PORTION_SIZE))
+            val preparation = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PREPARATION))
+            val createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_CREATED))
+            val editedAt = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_EDITED))
+
+            // Convert ingredients JSON back into a list
+            val ingredientsType = object : TypeToken<List<String>>() {}.type
+            val ingredients: List<String> = Gson().fromJson(ingredientsJson, ingredientsType)
+
+            recipe = Recipe(id, name, ingredients, servings, portionSize, preparation, createdAt, editedAt)
+        }
+
         cursor.close()
         db.close()
 
-        return recipes
+        return recipe ?: throw IllegalArgumentException("Recipe with ID $recipeId not found")
     }
+
 }

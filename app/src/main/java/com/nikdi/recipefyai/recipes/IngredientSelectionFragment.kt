@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,18 +17,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import coil.Coil
 import coil.request.ImageRequest
 import com.google.android.material.snackbar.Snackbar
+import com.nikdi.recipefyai.MainActivity
 import com.nikdi.recipefyai.R
 import com.nikdi.recipefyai.airel.BoundingBox
 import com.nikdi.recipefyai.airel.YOLODetector
-import com.nikdi.recipefyai.databinding.FragmentIngredientChoosingBinding
+import com.nikdi.recipefyai.databinding.FragmentIngredientSelectionBinding
 import com.nikdi.recipefyai.utils.IngredientAdapter
 import kotlinx.coroutines.*
-import kotlinx.coroutines.selects.select
 
-class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, RecipeDetailsDialog.RecipeDetailsListener {
-    private var _binding: FragmentIngredientChoosingBinding? = null
+class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, RecipeDetailsDialog.RecipeDetailsListener {
+    private var _binding: FragmentIngredientSelectionBinding? = null
     private val binding get() = _binding!!
-    private val args: IngredientChoosingFragmentArgs by navArgs()
+    private val args: IngredientSelectionFragmentArgs by navArgs()
     private var yoloDetector: YOLODetector? = null
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var ingredientAdapter: IngredientAdapter
@@ -41,7 +40,8 @@ class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, Re
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentIngredientChoosingBinding.inflate(inflater, container, false)
+        (activity as MainActivity).setUpActionBarForFragment(this)
+        _binding = FragmentIngredientSelectionBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -166,7 +166,7 @@ class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, Re
                 context = requireContext(),
                 modelPath = "internet.tflite", // TODO introduce the model
                 labelPath = "labels.txt",
-                detectorListener = this@IngredientChoosingFragment,
+                detectorListener = this@IngredientSelectionFragment,
                 message = { msg -> Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show() }
             )
         }
@@ -237,8 +237,8 @@ class IngredientChoosingFragment : Fragment(), YOLODetector.DetectorListener, Re
         selectedServings = servings
         selectedPortionSize = portionSize
 
-        val action = IngredientChoosingFragmentDirections
-            .actionIngredientChoiceFragmentToTemporaryRecipeFragment(
+        val action = IngredientSelectionFragmentDirections
+            .actionIngredientSelectionFragmentToTemporaryRecipeFragment(
                 ingredientsList.toTypedArray(),
                 servings.toInt(),
                 portionSize.toFloat())

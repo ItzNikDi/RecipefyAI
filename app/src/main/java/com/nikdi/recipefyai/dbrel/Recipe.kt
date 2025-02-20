@@ -1,10 +1,12 @@
 package com.nikdi.recipefyai.dbrel
 
 data class Recipe(
-    val id: Int,
+    val id: String,
     val name: String,
-    val ingredients: String,
+    val ingredients: List<String>,
     val servings: Int,
     val portionSize: Float,
-    val preparation: String
+    val preparation: String,
+    val createdAt: Long,
+    val editedAt: Long
 )

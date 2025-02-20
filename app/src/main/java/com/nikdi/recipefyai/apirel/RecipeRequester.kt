@@ -14,11 +14,10 @@ interface RecipeRequester {
 data class RecipeRequest(
     @SerializedName("ingredients") val ingredients: List<String>,
     @SerializedName("servings") val servings: Int,
-    @SerializedName("units") val units: String
+    @SerializedName("portion_size") val portionSize: Float
 )
 
 // Response Model
 data class RecipeResponse(
     @SerializedName("markdown") val markdown: String,
-    @SerializedName("user_id") val uuid: String
 )

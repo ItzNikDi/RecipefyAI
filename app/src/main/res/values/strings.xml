@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Recipefy.AI</string>
     <string name="proceed">Продължете напред</string>
-    <string name="enter_hint">въведи</string>
+    <string name="enter_hint">въведи тук</string>
     <string name="cancel">Откажи</string>
     <string name="new_recipe">Нова рецепта</string>
     <string name="open_sidebar">Отвори менюто с рецепти</string>
@@ -9,12 +9,12 @@
     <string name="inference_wait">Разпознаваме вашите продукти…</string>
     <string name="server_response_wait">Създаваме вашата рецепта…</string>
     <string name="network_error">Мрежова грешка. Моля, опитайте отново!</string>
-    <string name="response_error">Грешка:</string>
     <string name="choose_method">От какво бихте желали да подберете продуктите?</string>
     <string name="from_photo">От снимка</string>
     <string name="from_text">От текст</string>
     <string name="ingredients_title">Подбор на съставки</string>
-    <string name="details_title">Детайли за рецептата</string>
+    <string name="details_title">Въведете детайли за рецептата</string>
+    <string name="enter_name_title">Въведете име за рецептата</string>
     <string name="cooking_title">Предложение за рецепта</string>
     <string name="create_new_recipe">Създай нова рецепта</string>
     <string name="list_old_recipes">Покажи създадени рецепти</string>
@@ -32,7 +32,11 @@
     <string name="portion_size_empty">Моля въведете размер на порцията!</string>
     <string name="regenerate_recipe">Създай друга рецепта</string>
     <string name="save_recipe">Запази рецептата</string>
+    <string name="recipe_saved">Запазена!</string>
     <string name="invalid_recipe">Не можем да запазим тази рецепта!</string>
     <string name="unnamed_recipe">Неименована рецепта</string>
+    <string name="recipe_name_empty">Моля въведете име!</string>
     <string name="display_recipes">Рецепти</string>
+    <string name="saved_recipes">Запазени рецепти</string>
+    <string name="delete_recipe">Изтрий рецептата</string>
 </resources>

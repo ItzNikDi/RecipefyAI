@@ -1,13 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.RecipefyAI.Dark" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="android:windowFullscreen">false</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <!-- Customize your theme here. -->
-    </style>
-    <style name="Theme.RecipefyAI.Dark.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="Theme.RecipefyAI" parent="Theme.Material3.Dark">
+        <item name="colorPrimary">@color/background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

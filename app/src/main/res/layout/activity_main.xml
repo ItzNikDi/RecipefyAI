@@ -18,12 +18,11 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             android:background="@color/toolbarColor"
-            app:titleTextColor="@color/textColor"
             android:title="@string/create_new_recipe"
-            android:elevation="4dp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:titleTextColor="@color/textColor" />
 
         <!-- Fragment container (where fragments will be displayed) -->
         <androidx.fragment.app.FragmentContainerView
@@ -31,12 +30,12 @@
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:defaultNavHost="true"
-            app:navGraph="@navigation/nav_graph"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:navGraph="@navigation/nav_graph" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -45,9 +44,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:scrollbars="vertical"
         android:background="@color/background"
+        android:scrollbars="vertical"
+        app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_menu"
-        app:headerLayout="@layout/nav_header">
-    </com.google.android.material.navigation.NavigationView>
+        android:paddingTop="?attr/actionBarSize"/>
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -3,11 +3,12 @@
     <item
         android:id="@+id/nav_new_recipe"
         android:title="@string/new_recipe"
-        android:icon="@drawable/ic_menu_new"/>
+        android:icon="@drawable/ic_menu_new" />
 
     <item
         android:id="@+id/nav_recipes_group"
-        android:title="@string/save_recipe">
+        android:title="@string/saved_recipes"
+        android:checkable="false">
         <menu>
         </menu>
     </item>

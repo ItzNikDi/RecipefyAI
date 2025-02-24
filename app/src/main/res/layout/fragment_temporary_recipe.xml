@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:fitsSystemWindows="true"
     android:background="@color/background">
     
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -55,6 +54,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginEnd="4dp"
+                android:paddingHorizontal="12dp"
                 android:text="@string/regenerate_recipe"
                 android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
                 android:textColor="@color/textColor"
@@ -69,6 +69,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginStart="4dp"
+                android:paddingHorizontal="12dp"
                 android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
                 android:backgroundTint="@color/buttonColor"
                 android:text="@string/save_recipe"

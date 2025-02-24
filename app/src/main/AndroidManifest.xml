@@ -24,7 +24,7 @@
             android:name=".MainActivity"
             android:configChanges="fontScale|screenSize|smallestScreenSize|keyboardHidden|orientation"
             android:exported="true"
-            android:theme="@style/Theme.RecipefyAI">
+            android:theme="@style/Theme.RecipefyAI.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

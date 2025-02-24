@@ -45,9 +45,9 @@ object PermissionManager {
     fun onRequestPermissionsResult(requestCode: Int, activity: Activity, proceedToApp: () -> Unit, showSettingsDialog: () -> Unit) {
         if (requestCode == RequiredPermissions.PERMISSION_REQUEST_CODE) {
             if (arePermissionsGranted(activity, RequiredPermissions.permissions)) {
-                proceedToApp() // Permissions granted, proceed to app
+                proceedToApp()
             } else {
-                showSettingsDialog() // Permissions denied, show settings dialog
+                showSettingsDialog()
             }
         }
     }

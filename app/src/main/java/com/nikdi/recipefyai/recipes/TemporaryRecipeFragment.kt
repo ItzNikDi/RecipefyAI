@@ -1,14 +1,11 @@
 package com.nikdi.recipefyai.recipes
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.nikdi.recipefyai.MainActivity
@@ -18,27 +15,37 @@ import com.nikdi.recipefyai.apirel.RecipeResponse
 import com.nikdi.recipefyai.apirel.RetrofitClient
 import com.nikdi.recipefyai.databinding.FragmentTemporaryRecipeBinding
 import com.nikdi.recipefyai.dbrel.Recipe
-import com.nikdi.recipefyai.dbrel.RecipeSQLiteHelper
+import com.nikdi.recipefyai.viewmodel.RecipeViewModel
 import io.noties.markwon.Markwon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.UUID
 
-class TemporaryRecipeFragment : Fragment() {
+class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener {
     private var _binding: FragmentTemporaryRecipeBinding? = null
+    private lateinit var recipeViewModel: RecipeViewModel
     private val binding get() = _binding!!
     private val args: TemporaryRecipeFragmentArgs by navArgs()
-    private lateinit var database: RecipeSQLiteHelper
     private lateinit var loadingOverlay: View
     private var currentRecipe: Recipe? = null
     private var isRecipeValid = false
+    private var recipeName: String? = null
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         (activity as MainActivity).setUpActionBarForFragment(this)
         _binding = FragmentTemporaryRecipeBinding.inflate(inflater, container, false)
+
+        recipeViewModel = ViewModelProvider(this)[RecipeViewModel::class.java]
+
         return binding.root
     }
 
@@ -46,24 +53,22 @@ class TemporaryRecipeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         loadingOverlay = binding.loadingOverlay
-        Log.d("Loaded", args.ingredients.toList().toString())
-        Log.d("Loaded", args.servings.toString())
-        Log.d("Loaded", args.portionSize.toString())
         showLoading(true)
-        val recipeRequest = RecipeRequest(args.ingredients.toList(), args.servings, args.portionSize)
 
-        database = RecipeSQLiteHelper(requireContext())
+        val recipeRequest =
+            RecipeRequest(args.ingredients.toList(), args.servings, args.portionSize)
 
         sendRecipeToServer(recipeRequest)
 
-        binding.btnSaveRecipe.setOnClickListener { if (isRecipeValid && currentRecipe != null) {
-            database.saveRecipe(currentRecipe!!)
-            Snackbar.make(view, "Added!", Snackbar.LENGTH_SHORT).show()
-        } else {
-            Snackbar.make(view, getString(R.string.invalid_recipe), Snackbar.LENGTH_SHORT)
-                .setAnchorView(binding.buttonLayout)
-                .show()
-        }}
+        binding.btnSaveRecipe.setOnClickListener {
+            if (isRecipeValid) {
+                showNameDialog()
+            } else {
+                Snackbar.make(view, getString(R.string.invalid_recipe), Snackbar.LENGTH_SHORT)
+                    .setAnchorView(binding.buttonLayout)
+                    .show()
+            }
+        }
         binding.btnRegenRecipe.setOnClickListener { sendRecipeToServer(recipeRequest) }
 
         binding.vertScrollView.isSmoothScrollingEnabled = true
@@ -75,51 +80,60 @@ class TemporaryRecipeFragment : Fragment() {
         binding.btnRegenRecipe.isEnabled = false  // Disable button to prevent spam requests
         binding.btnSaveRecipe.isEnabled = false
 
-        RetrofitClient.apiService.generateRecipe(recipeRequest).enqueue(object : Callback<RecipeResponse> {
-            override fun onResponse(call: Call<RecipeResponse>, response: Response<RecipeResponse>) {
-                showLoading(false)  // Hide loading
-                binding.btnRegenRecipe.isEnabled = true  // Re-enable button
+        RetrofitClient.apiService.generateRecipe(recipeRequest)
+            .enqueue(object : Callback<RecipeResponse> {
+                override fun onResponse(
+                    call: Call<RecipeResponse>,
+                    response: Response<RecipeResponse>
+                ) {
+                    showLoading(false)  // Hide loading
+                    binding.btnRegenRecipe.isEnabled = true  // Re-enable button
 
-                if (response.isSuccessful && response.body() != null) {
-                    val markdownResponse = response.body()!!.markdown
-                    Log.d("RecipeResponse", markdownResponse)
+                    if (response.isSuccessful) {
+                        response.body()?.let { recipeResponse ->
+                            val markdownResponse = recipeResponse.markdown
+                            val extractedName = extractName(markdownResponse)
 
-                    val recipe = Recipe(
-                        id = UUID.randomUUID().toString(),
-                        name = extractName(markdownResponse),
-                        ingredients = args.ingredients.toList(),
-                        servings = args.servings,
-                        portionSize = args.portionSize,
-                        preparation = markdownResponse,
-                        createdAt = System.currentTimeMillis(),
-                        editedAt = System.currentTimeMillis()
-                    )
+                            currentRecipe = Recipe(
+                                id = UUID.randomUUID().toString(),
+                                name = extractedName,
+                                ingredients = args.ingredients.toList(),
+                                servings = args.servings,
+                                portionSize = args.portionSize,
+                                preparation = markdownResponse,
+                                createdAt = System.currentTimeMillis(),
+                                editedAt = System.currentTimeMillis()
+                            )
 
-                    currentRecipe = recipe
-                    displayMarkdown(markdownResponse)
-                    isRecipeValid = true
-                    binding.btnSaveRecipe.isEnabled = true
-                } else {
+                            displayMarkdown(markdownResponse)
+                            isRecipeValid = true
+                            binding.btnSaveRecipe.isEnabled = true
+                        }
+                    } else {
+                        binding.textViewOutput.text = getString(R.string.network_error)
+                        isRecipeValid = false
+                        binding.btnSaveRecipe.isEnabled = false
+                    }
+                }
+
+                override fun onFailure(call: Call<RecipeResponse>, t: Throwable) {
+                    showLoading(false)  // Hide loading
                     binding.textViewOutput.text = getString(R.string.network_error)
-                    isRecipeValid = false
+                    isRecipeValid = false  // Prevent saving
+                    binding.btnRegenRecipe.isEnabled = true  // Re-enable button
                     binding.btnSaveRecipe.isEnabled = false
                 }
-            }
-
-            override fun onFailure(call: Call<RecipeResponse>, t: Throwable) {
-                showLoading(false)  // Hide loading
-                Log.e("RecipeError", "${t.message}")
-                binding.textViewOutput.text = getString(R.string.network_error)
-                isRecipeValid = false  // Prevent saving
-                binding.btnRegenRecipe.isEnabled = true  // Re-enable button
-                binding.btnSaveRecipe.isEnabled = false
-            }
-        })
+            })
     }
 
 
     private fun showLoading(isLoading: Boolean) {
         loadingOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    private fun showNameDialog() {
+        val dialog = RecipeNameDialog.newInstance(recipeName)
+        dialog.show(childFragmentManager, "RecipeNameDialog")
     }
 
     private fun extractName(markdownText: String): String {
@@ -133,8 +147,28 @@ class TemporaryRecipeFragment : Fragment() {
         markdownView.setMarkdown(binding.textViewOutput, markdownText)
     }
 
+    override fun onCancel(name: String) {
+        recipeName = name
+    }
+
+    override fun onSaveRecipe(name: String) {
+        recipeName = name
+        currentRecipe?.let {
+            coroutineScope.launch(Dispatchers.IO) {
+                val updatedRecipe = it.copy(name = name)
+                recipeViewModel.saveRecipe(updatedRecipe)
+                withContext(Dispatchers.Main) {
+                    Snackbar.make(requireView(), getString(R.string.recipe_saved), Snackbar.LENGTH_SHORT)
+                        .setAnchorView(binding.btnSaveRecipe)
+                        .show()
+                }
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        coroutineScope.cancel()
     }
 }

@@ -1,14 +1,14 @@
 package com.nikdi.recipefyai
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import com.nikdi.recipefyai.utils.PermissionManager
 import com.nikdi.recipefyai.utils.PreferenceManager
@@ -18,29 +18,29 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.navigation.NavigationView
 import com.nikdi.recipefyai.databinding.ActivityMainBinding
-import com.nikdi.recipefyai.dbrel.RecipeSQLiteHelper
 import com.nikdi.recipefyai.dbrel.RecipeSummary
-import com.nikdi.recipefyai.recipes.DisplaySavedRecipeFragment
 import com.nikdi.recipefyai.recipes.IngredientSelectionFragment
 import com.nikdi.recipefyai.recipes.NewRecipeFragment
 import com.nikdi.recipefyai.recipes.TemporaryRecipeFragment
+import com.nikdi.recipefyai.viewmodel.RecipeViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var viewModel: RecipeViewModel
     private lateinit var preferenceManager: PreferenceManager
     private lateinit var binding: ActivityMainBinding
-    private lateinit var database: RecipeSQLiteHelper
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navView: NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
-    private var alreadyProceeded = false  // Prevents multiple calls
+    private var alreadyProceeded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         preferenceManager = PreferenceManager(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
@@ -59,19 +59,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        database = RecipeSQLiteHelper(this)
+        viewModel = ViewModelProvider(this)[RecipeViewModel::class.java]
 
-        // DrawerLayout setup
-        drawerLayout = binding.drawerLayout
-        navView = binding.navigationView
-
-        toggle = ActionBarDrawerToggle(
-            this, drawerLayout, binding.toolbar,
-            R.string.open_sidebar, R.string.close_sidebar
-        )
-        toggle.isDrawerIndicatorEnabled = true
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
+        setupDrawer()
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -79,15 +69,8 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(setOf(R.id.newRecipeFragment, R.id.displaySavedRecipeFragment), drawerLayout)
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
-        populateRecipesMenu(database.getAllRecipeNamesSorted())
-        navView.invalidate()
-
-        navView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.nav_new_recipe -> navigateTo(R.id.newRecipeFragment)
-            }
-            drawerLayout.closeDrawer(GravityCompat.START)
-            true
+        viewModel.recipesLiveData.observe(this) { recipes ->
+            populateRecipesMenu(recipes)
         }
 
         if (savedInstanceState == null) {
@@ -97,14 +80,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // If permissions are granted, proceed
+
         if (PermissionManager.checkPermissions(this, RequiredPermissions.permissions)) {
-            if (!alreadyProceeded) {  // Ensure it runs only once
+            if (!alreadyProceeded) {
                 alreadyProceeded = true
                 proceedToApp()
             }
         } else {
-            // If permissions are not granted, show the settings dialog
             if (!preferenceManager.isFirstRun()) {
                 PermissionManager.showSettingsDialog(this, this)
             }
@@ -116,48 +98,77 @@ class MainActivity : AppCompatActivity() {
         PermissionManager.onRequestPermissionsResult(
             requestCode,
             this,
-            ::proceedToApp  // Proceed when permissions are granted
+            ::proceedToApp
         ) {
-            PermissionManager.showSettingsDialog(this, this)  // Show settings dialog if permissions are denied
+            PermissionManager.showSettingsDialog(this, this)
+        }
+    }
+
+    private fun setupDrawer() {
+        drawerLayout = binding.drawerLayout
+        navView = binding.navigationView
+
+        toggle = ActionBarDrawerToggle(
+            this, drawerLayout, binding.toolbar,
+            R.string.open_sidebar, R.string.close_sidebar
+        )
+
+        toggle.isDrawerIndicatorEnabled = true
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_new_recipe -> {
+                    navigateTo(R.id.newRecipeFragment)
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                    true
+                }
+                else -> false
+            }
         }
     }
 
     private fun populateRecipesMenu(recipes: List<RecipeSummary>) {
-        val navView = findViewById<NavigationView>(R.id.navigation_view)
         val menu = navView.menu
         val recipesGroup = menu.findItem(R.id.nav_recipes_group)?.subMenu ?: return
 
         recipesGroup.clear()
 
         for (recipe in recipes) {
-            Log.d("DBDebug", "ID: ${recipe.id}, Name: ${recipe.name}")
-            recipesGroup.add(Menu.NONE, recipe.id.hashCode(), Menu.NONE, recipe.name)
-                .setOnMenuItemClickListener {
-                    openRecipe(recipe.id)
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                    true
-                }
+            val menuItem = recipesGroup.add(Menu.NONE, recipe.id.hashCode(), Menu.NONE, recipe.name)
+            menuItem.setOnMenuItemClickListener {
+                openRecipe(recipe.id)
+                drawerLayout.closeDrawer(GravityCompat.START)
+                true
+            }
         }
     }
 
+    private fun deleteRecipe(recipeId: String) {
+        viewModel.viewModelScope.launch {
+            viewModel.deleteRecipeById(recipeId)
+        }
+        navigateTo(R.id.newRecipeFragment)
+    }
 
-    // Navigate to correct fragment
     private fun openRecipe(recipeId: String) {
         val bundle = Bundle().apply {
             putString("recipe_id", recipeId)
         }
-        // Use the NavController to navigate using actions defined in the nav_graph
         findNavController(R.id.nav_host_fragment).navigate(R.id.displaySavedRecipeFragment, bundle)
     }
 
     private fun proceedToApp() {
+        if (alreadyProceeded) return
+        alreadyProceeded = true
+
         if (preferenceManager.isFirstRun()) preferenceManager.setFirstRun(false)
-        // Navigate to the "New Recipe" screen (adjust the ID as per your setup)
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+
         val navController = navHostFragment.navController
         navController.navigate(R.id.newRecipeFragment)
-        Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateTo(destinationId: Int) {
@@ -173,14 +184,15 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START) // Close the drawer if open
+            drawerLayout.closeDrawer(GravityCompat.START)
         }
     }
 
     fun setUpActionBarForFragment(fragment: Fragment) {
         val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+        binding.toolbar.menu.clear()
         when (fragment) {
-            is NewRecipeFragment, is DisplaySavedRecipeFragment -> {
+            is NewRecipeFragment -> {
                 binding.toolbar.setNavigationOnClickListener {
                     drawerLayout.openDrawer(GravityCompat.START)
                 }
@@ -193,4 +205,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun setUpActionBarForSavedRecipes(recipeId: String) {
+        binding.toolbar.menu.clear()
+        binding.toolbar.inflateMenu(R.menu.recipe_context_menu)
+
+        binding.toolbar.setNavigationOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_delete_recipe -> {
+                    deleteRecipe(recipeId)
+                    true
+                }
+                else -> false
+            }
+        }
+    }
 }

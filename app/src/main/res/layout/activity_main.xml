@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:background="@color/toolbarColor"
             android:title="@string/create_new_recipe"
+            app:titleTextAppearance="@style/TextAppearance.RecipefyAI.Large"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:titleTextColor="@color/textColor" />
@@ -44,9 +45,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:fitsSystemWindows="true"
         android:background="@color/background"
         android:scrollbars="vertical"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/nav_menu"
-        android:paddingTop="?attr/actionBarSize"/>
+        app:menu="@menu/nav_menu" />
 </androidx.drawerlayout.widget.DrawerLayout>

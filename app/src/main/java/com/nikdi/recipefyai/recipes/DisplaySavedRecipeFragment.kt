@@ -14,7 +14,7 @@ import com.nikdi.recipefyai.viewmodel.RecipeViewModel
 import io.noties.markwon.Markwon
 
 class DisplaySavedRecipeFragment: Fragment() {
-    private val sharedPreferences: SharedPreferences = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE) //TODO finish up the last-point of entry logic
+    //private val sharedPreferences: SharedPreferences = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE) //TODO finish up the last point of entry logic
     private var _binding: FragmentDisplaySavedRecipeBinding? = null
     private val binding get() = _binding!!
     private lateinit var recipeViewModel: RecipeViewModel

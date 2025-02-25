@@ -3,6 +3,7 @@ package com.nikdi.recipefyai.recipes
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
@@ -45,9 +46,6 @@ class RecipeDetailsDialog() : DialogFragment() {
             .create()
 
         binding.btnCancel.setOnClickListener {
-            val servings = binding.servingsInput.text.toString()
-            val portionSize = binding.portionSizeInput.text.toString()
-            listener?.onCancel(servings, portionSize)
             dismiss()
         }
 
@@ -75,6 +73,13 @@ class RecipeDetailsDialog() : DialogFragment() {
                 .show()
             return false
         } else return true
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        val servings = binding.servingsInput.text.toString()
+        val portionSize = binding.portionSizeInput.text.toString()
+        listener?.onCancel(servings, portionSize)
     }
 
     override fun onDestroyView() {

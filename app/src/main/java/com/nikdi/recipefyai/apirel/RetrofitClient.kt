@@ -13,7 +13,7 @@ private val client = OkHttpClient.Builder()
     .build()
 
 object RetrofitClient {
-    private const val REQ_URL = "https://noitrecipefai.duckdns.org/" // TODO set the url + SSL
+    private const val REQ_URL = "https://noitrecipefai.duckdns.org/"
 
     val apiService: RecipeRequester by lazy {
         Retrofit.Builder()

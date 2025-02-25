@@ -1,10 +1,18 @@
 package com.nikdi.recipefyai
 
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
 import android.view.Menu
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.text.set
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.setPadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +30,7 @@ import com.nikdi.recipefyai.dbrel.RecipeSummary
 import com.nikdi.recipefyai.recipes.IngredientSelectionFragment
 import com.nikdi.recipefyai.recipes.NewRecipeFragment
 import com.nikdi.recipefyai.recipes.TemporaryRecipeFragment
+import com.nikdi.recipefyai.utils.CustomTypefaceSpan
 import com.nikdi.recipefyai.viewmodel.RecipeViewModel
 import kotlinx.coroutines.launch
 
@@ -117,6 +126,8 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
+        applyFontToMenu(navView.menu)
+
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_new_recipe -> {
@@ -129,14 +140,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //TODO set UI buttons as different colors and put README and LICENSE in git
+
+    private fun applyFontToMenu(menu: Menu) {
+        val typeface = ResourcesCompat.getFont(this, R.font.comfortaa_variable)
+
+        fun applyFontToItems(menu: Menu) {
+            for (i in 0 until menu.size()) {
+                val menuItem = menu.getItem(i)
+                val spannableString = SpannableString(menuItem.title)
+                spannableString.setSpan(CustomTypefaceSpan("", typeface!!), 0, spannableString.length, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+                menuItem.title = spannableString
+
+                if (menuItem.hasSubMenu()) {
+                    applyFontToItems(menuItem.subMenu!!)
+                }
+            }
+        }
+
+        applyFontToItems(menu)
+    }
+
     private fun populateRecipesMenu(recipes: List<RecipeSummary>) {
         val menu = navView.menu
         val recipesGroup = menu.findItem(R.id.nav_recipes_group)?.subMenu ?: return
 
         recipesGroup.clear()
 
+        val typeface = ResourcesCompat.getFont(this, R.font.comfortaa_variable)
+
         for (recipe in recipes) {
             val menuItem = recipesGroup.add(Menu.NONE, recipe.id.hashCode(), Menu.NONE, recipe.name)
+            val spannableString = SpannableString(menuItem.title)
+            spannableString.setSpan(CustomTypefaceSpan("", typeface!!), 0, spannableString.length, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+            menuItem.title = spannableString
             menuItem.setOnMenuItemClickListener {
                 openRecipe(recipe.id)
                 drawerLayout.closeDrawer(GravityCompat.START)

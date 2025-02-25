@@ -3,14 +3,13 @@ package com.nikdi.recipefyai.recipes
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.nikdi.recipefyai.R
 import com.nikdi.recipefyai.databinding.DialogRecipeNameBinding
-import kotlinx.coroutines.launch
 
 class RecipeNameDialog : DialogFragment() {
     private var _binding: DialogRecipeNameBinding? = null
@@ -44,8 +43,6 @@ class RecipeNameDialog : DialogFragment() {
             .create()
 
         binding.btnCancel.setOnClickListener {
-            val selectedName = binding.recipeNameInput.text.toString()
-            listener?.onCancel(selectedName)
             dismiss()
         }
 
@@ -68,6 +65,12 @@ class RecipeNameDialog : DialogFragment() {
                 .show()
             return false
         } else return true
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        val selectedName = binding.recipeNameInput.text.toString()
+        listener?.onCancel(selectedName)
     }
 
     override fun onDestroyView() {

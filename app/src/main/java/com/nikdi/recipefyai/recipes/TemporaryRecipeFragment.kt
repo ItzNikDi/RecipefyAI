@@ -17,11 +17,6 @@ import com.nikdi.recipefyai.databinding.FragmentTemporaryRecipeBinding
 import com.nikdi.recipefyai.dbrel.Recipe
 import com.nikdi.recipefyai.viewmodel.RecipeViewModel
 import io.noties.markwon.Markwon
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -29,19 +24,17 @@ import java.util.UUID
 
 class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener {
     private var _binding: FragmentTemporaryRecipeBinding? = null
-    private lateinit var recipeViewModel: RecipeViewModel
     private val binding get() = _binding!!
     private val args: TemporaryRecipeFragmentArgs by navArgs()
+    private lateinit var recipeViewModel: RecipeViewModel
     private lateinit var loadingOverlay: View
     private var currentRecipe: Recipe? = null
     private var isRecipeValid = false
     private var recipeName: String? = null
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        (activity as MainActivity).setUpActionBarForFragment(this)
         _binding = FragmentTemporaryRecipeBinding.inflate(inflater, container, false)
 
         recipeViewModel = ViewModelProvider(this)[RecipeViewModel::class.java]
@@ -59,6 +52,8 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
             RecipeRequest(args.ingredients.toList(), args.servings, args.portionSize)
 
         sendRecipeToServer(recipeRequest)
+
+        (activity as MainActivity).setUpActionBarForFragment(this)
 
         binding.btnSaveRecipe.setOnClickListener {
             if (isRecipeValid) {
@@ -86,8 +81,8 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
                     call: Call<RecipeResponse>,
                     response: Response<RecipeResponse>
                 ) {
-                    showLoading(false)  // Hide loading
-                    binding.btnRegenRecipe.isEnabled = true  // Re-enable button
+                    showLoading(false)
+                    binding.btnRegenRecipe.isEnabled = true
 
                     if (response.isSuccessful) {
                         response.body()?.let { recipeResponse ->
@@ -154,21 +149,16 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
     override fun onSaveRecipe(name: String) {
         recipeName = name
         currentRecipe?.let {
-            coroutineScope.launch(Dispatchers.IO) {
-                val updatedRecipe = it.copy(name = name)
-                recipeViewModel.saveRecipe(updatedRecipe)
-                withContext(Dispatchers.Main) {
-                    Snackbar.make(requireView(), getString(R.string.recipe_saved), Snackbar.LENGTH_SHORT)
-                        .setAnchorView(binding.btnSaveRecipe)
-                        .show()
-                }
-            }
+            val updatedRecipe = it.copy(name = name)
+            recipeViewModel.saveRecipe(updatedRecipe)
+            Snackbar.make(requireView(), getString(R.string.recipe_saved), Snackbar.LENGTH_SHORT)
+                .setAnchorView(binding.btnSaveRecipe)
+                .show()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        coroutineScope.cancel()
     }
 }

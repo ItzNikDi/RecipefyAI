@@ -13,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.nikdi.recipefyai.MainActivity
-import com.nikdi.recipefyai.R
 import com.nikdi.recipefyai.databinding.FragmentNewRecipeBinding
 
 class NewRecipeFragment : Fragment() {
@@ -33,20 +32,15 @@ class NewRecipeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Button: Create Recipe from Photo
         binding.btnFromPhoto.setOnClickListener {
-            // Navigate to a fragment that handles photo-based recipe creation
             openGallery()
         }
 
-        // Button: Create Recipe from Text
         binding.btnFromText.setOnClickListener {
-            // Navigate to a fragment that handles text-based recipe creation
             val action = NewRecipeFragmentDirections.actionNewRecipeFragmentToIngredientSelectionFragment(null)
             findNavController().navigate(action)
         }
 
-        // Register gallery picker for selecting images for recipe creation
         galleryResultLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -67,6 +61,6 @@ class NewRecipeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null // Prevent memory leaks by clearing binding reference
+        _binding = null
     }
 }

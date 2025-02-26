@@ -1,7 +1,5 @@
 package com.nikdi.recipefyai.recipes
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +12,6 @@ import com.nikdi.recipefyai.viewmodel.RecipeViewModel
 import io.noties.markwon.Markwon
 
 class DisplaySavedRecipeFragment: Fragment() {
-    //private val sharedPreferences: SharedPreferences = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE) //TODO finish up the last point of entry logic
     private var _binding: FragmentDisplaySavedRecipeBinding? = null
     private val binding get() = _binding!!
     private lateinit var recipeViewModel: RecipeViewModel
@@ -27,8 +24,6 @@ class DisplaySavedRecipeFragment: Fragment() {
 
         recipeId = arguments?.getString("recipe_id") ?: return binding.root
 
-        (activity as MainActivity).setUpActionBarForSavedRecipes(recipeId)
-
         recipeViewModel = ViewModelProvider(this)[RecipeViewModel::class.java]
 
         recipeViewModel.getRecipeById(recipeId).observe(viewLifecycleOwner) { recipe ->
@@ -39,6 +34,8 @@ class DisplaySavedRecipeFragment: Fragment() {
                 (activity as MainActivity).supportActionBar?.title = recipe.name
             }
         }
+
+        (activity as MainActivity).setUpActionBarForSavedRecipes(recipeId)
 
         return binding.root
     }

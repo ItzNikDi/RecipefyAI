@@ -1,18 +1,14 @@
 package com.nikdi.recipefyai
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.view.Menu
-import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.text.set
 import androidx.core.view.GravityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.setPadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -82,33 +78,20 @@ class MainActivity : AppCompatActivity() {
             populateRecipesMenu(recipes)
         }
 
-        if (savedInstanceState == null) {
-            navigateTo(R.id.newRecipeFragment)
-        }
+        navigateToLastFragment()
     }
 
     override fun onResume() {
         super.onResume()
-
-        if (PermissionManager.checkPermissions(this, RequiredPermissions.permissions)) {
-            if (!alreadyProceeded) {
-                alreadyProceeded = true
-                proceedToApp()
-            }
-        } else {
-            if (!preferenceManager.isFirstRun()) {
-                PermissionManager.showSettingsDialog(this, this)
-            }
+        if (!alreadyProceeded && PermissionManager.checkPermissions(this, RequiredPermissions.permissions)) {
+            alreadyProceeded = true
+            proceedToApp()
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        PermissionManager.onRequestPermissionsResult(
-            requestCode,
-            this,
-            ::proceedToApp
-        ) {
+        PermissionManager.onRequestPermissionsResult(requestCode, this, ::proceedToApp) {
             PermissionManager.showSettingsDialog(this, this)
         }
     }
@@ -135,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     true
                 }
-                else -> false
+                else -> true
             }
         }
     }
@@ -193,7 +176,8 @@ class MainActivity : AppCompatActivity() {
         val bundle = Bundle().apply {
             putString("recipe_id", recipeId)
         }
-        findNavController(R.id.nav_host_fragment).navigate(R.id.displaySavedRecipeFragment, bundle)
+        (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController.navigate(R.id.displaySavedRecipeFragment, bundle)
+        saveLastFragment(R.id.displaySavedRecipeFragment, recipeId)
     }
 
     private fun proceedToApp() {
@@ -201,16 +185,47 @@ class MainActivity : AppCompatActivity() {
         alreadyProceeded = true
 
         if (preferenceManager.isFirstRun()) preferenceManager.setFirstRun(false)
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
-        navController.navigate(R.id.newRecipeFragment)
+
+        if (navController.currentDestination?.id != R.id.newRecipeFragment) {
+            navController.popBackStack()
+            navController.navigate(R.id.newRecipeFragment)
+        }
     }
 
     private fun navigateTo(destinationId: Int) {
         val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+        saveLastFragment(destinationId)
         navController.navigate(destinationId)
+    }
+
+    private fun saveLastFragment(fragmentId: Int, recipeId: String? = null) {
+        val sharedPreferences = getSharedPreferences("AppStatePrefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit().apply{
+            putInt("last_fragment_id", fragmentId)
+            if (recipeId != null) putString("last_recipe_id", recipeId)
+            apply()
+        }
+    }
+
+    private fun navigateToLastFragment() {
+        val sharedPreferences = getSharedPreferences("AppStatePrefs", Context.MODE_PRIVATE)
+        val lastFragmentId = sharedPreferences.getInt("last_fragment_id", -1)
+        val lastRecipeId = sharedPreferences.getString("last_recipe_id", null)
+
+        if (lastFragmentId != -1) {
+            val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+
+            if (navController.currentDestination?.id != lastFragmentId) {
+                if (lastFragmentId == R.id.displaySavedRecipeFragment && lastRecipeId != null) {
+                    openRecipe(lastRecipeId)
+                } else {
+                    navController.navigate(lastFragmentId)
+                }
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -234,7 +249,23 @@ class MainActivity : AppCompatActivity() {
                     drawerLayout.openDrawer(GravityCompat.START)
                 }
             }
-            is TemporaryRecipeFragment, is IngredientSelectionFragment -> {
+            is IngredientSelectionFragment -> {
+                binding.toolbar.setNavigationOnClickListener {
+                    navController.popBackStack()
+                }
+            }
+            is TemporaryRecipeFragment -> {
+                binding.toolbar.inflateMenu(R.menu.return_home)
+
+                binding.toolbar.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_return_home -> {
+                            //findNavController().navigate()
+                            true
+                        } else -> false
+                    }
+                }
+
                 binding.toolbar.setNavigationOnClickListener {
                     navController.popBackStack()
                 }

@@ -105,8 +105,8 @@
         android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
         android:backgroundTint="@color/buttonColor"
         android:textColor="@color/textColor"
-        android:layout_marginTop="16dp"
         android:paddingHorizontal="12dp"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"/>
 
     <Button
@@ -122,7 +122,7 @@
         android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
         android:backgroundTint="@color/buttonColor"
         android:textColor="@color/textColor"
-        android:layout_marginTop="16dp"
         android:paddingHorizontal="12dp"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

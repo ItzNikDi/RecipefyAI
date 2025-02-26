@@ -3,25 +3,37 @@ package com.nikdi.recipefyai.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import com.nikdi.recipefyai.dbrel.AppDatabase
 import com.nikdi.recipefyai.dbrel.Recipe
-import com.nikdi.recipefyai.dbrel.RecipeDao
+import com.nikdi.recipefyai.dbrel.RecipeRepository
 import com.nikdi.recipefyai.dbrel.RecipeSummary
+import kotlinx.coroutines.launch
 
 class RecipeViewModel(application: Application) : AndroidViewModel(application) {
-    private val recipeDao: RecipeDao = AppDatabase.getDatabase(application).recipeDao()
+    private val repository: RecipeRepository
 
-    val recipesLiveData: LiveData<List<RecipeSummary>> = recipeDao.getAllRecipeNamesSorted()
+    val recipesLiveData: LiveData<List<RecipeSummary>>
 
-    suspend fun deleteRecipeById(recipeId: String) {
-        recipeDao.deleteRecipeById(recipeId)
+    init {
+        val recipeDao = AppDatabase.getDatabase(application).recipeDao()
+        repository = RecipeRepository(recipeDao)
+        recipesLiveData = repository.recipesLiveData
+    }
+
+    fun deleteRecipeById(recipeId: String) {
+        viewModelScope.launch {
+            repository.deleteRecipeById(recipeId)
+        }
     }
 
     fun getRecipeById(recipeId: String): LiveData<Recipe> {
-        return recipeDao.getRecipeById(recipeId)
+        return repository.getRecipeById(recipeId)
     }
 
-    suspend fun saveRecipe(recipe: Recipe) {
-        recipeDao.saveRecipe(recipe)
+    fun saveRecipe(recipe: Recipe) {
+        viewModelScope.launch {
+            repository.saveRecipe(recipe)
+        }
     }
 }

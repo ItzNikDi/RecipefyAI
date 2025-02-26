@@ -39,4 +39,5 @@
     <string name="display_recipes">Рецепти</string>
     <string name="saved_recipes">Запазени рецепти</string>
     <string name="delete_recipe">Изтрий рецептата</string>
+    <string name="go_home">Върни се в началото</string>
 </resources>

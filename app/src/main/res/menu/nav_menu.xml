@@ -8,7 +8,6 @@
     <item
         android:id="@+id/nav_recipes_group"
         android:title="@string/saved_recipes">
-        <menu>
-        </menu>
+        <menu/>
     </item>
 </menu>

@@ -43,7 +43,7 @@ class IngredientAdapter(
         if (ingredients.size != uniqueIngredients.size) {
             ingredients.clear()
             ingredients.addAll(uniqueIngredients)
-            notifyDataSetChanged() // 🔥 Notify adapter of the full update
+            notifyDataSetChanged()
         }
     }
 

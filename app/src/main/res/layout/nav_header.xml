@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="150dp"
-    android:background="@drawable/side_nav_view"
+    android:background="@drawable/gradient_purple_blue"
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingBottom="10dp">
@@ -14,6 +13,7 @@
         android:text="@string/display_recipes"
         android:textSize="48sp"
         android:textColor="@color/textColor"
+        android:fontFamily="@font/comfortaa_variable"
         android:textAlignment="center"
         android:textStyle="bold"
         android:padding="12dp"/>

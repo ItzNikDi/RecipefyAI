@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:padding="6dp"
     android:gravity="center_vertical">
 
     <TextView
@@ -10,7 +10,6 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
         android:textColor="@color/textColor"/>
 
@@ -18,10 +17,9 @@
         android:id="@+id/btnRemove"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:backgroundTint="@color/buttonColor"
+        android:layout_marginStart="8dp"
         android:src="@drawable/ic_remove"
-        android:iconTint="@color/textColor"
-        android:padding="8dp"
+        style="@style/Widget.RecipefyAI.ImageButton"
+        app:tint="@color/gray"
         android:contentDescription="@string/remove_ingredient"/>
 </LinearLayout>

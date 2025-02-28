@@ -1,6 +1,8 @@
-package com.nikdi.recipefyai.recipes
+package com.nikdi.recipefyai.logicrel
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +33,8 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
     private var currentRecipe: Recipe? = null
     private var isRecipeValid = false
     private var recipeName: String? = null
-
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var enableButtonRunnable: Runnable
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -44,16 +47,27 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        enableButtonRunnable = Runnable {
+            if(isAdded) {
+                binding.btnRegenRecipe.apply {
+                    isEnabled = true
+                    isClickable = true
+                    alpha = 1f
+                    text = getString(R.string.regenerate_recipe)
+                }
+            }
+        }
         loadingOverlay = binding.loadingOverlay
         showLoading(true)
 
         val recipeRequest =
             RecipeRequest(args.ingredients.toList(), args.servings, args.portionSize)
 
+        startCooldown()
         sendRecipeToServer(recipeRequest)
 
         (activity as MainActivity).setUpActionBarForFragment(this)
+        (activity as MainActivity).setUpActionBarForTemporaryRecipes(false)
 
         binding.btnSaveRecipe.setOnClickListener {
             if (isRecipeValid) {
@@ -64,16 +78,31 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
                     .show()
             }
         }
-        binding.btnRegenRecipe.setOnClickListener { sendRecipeToServer(recipeRequest) }
+
+        binding.btnRegenRecipe.setOnClickListener {
+            startCooldown()
+            sendRecipeToServer(recipeRequest)
+        }
 
         binding.vertScrollView.isSmoothScrollingEnabled = true
         binding.textViewOutput.setHorizontallyScrolling(true)
     }
 
     private fun sendRecipeToServer(recipeRequest: RecipeRequest) {
-        showLoading(true)  // Show loading overlay
-        binding.btnRegenRecipe.isEnabled = false  // Disable button to prevent spam requests
-        binding.btnSaveRecipe.isEnabled = false
+        showLoading(true)
+
+        binding.btnRegenRecipe.apply {
+            isEnabled = false
+            isClickable = false
+            alpha = 0.5f
+        }
+        binding.btnSaveRecipe.apply {
+            isEnabled = false
+            isClickable = false
+            alpha = 0.5f
+        }
+
+        (activity as MainActivity).setUpActionBarForTemporaryRecipes(false)
 
         RetrofitClient.apiService.generateRecipe(recipeRequest)
             .enqueue(object : Callback<RecipeResponse> {
@@ -81,14 +110,14 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
                     call: Call<RecipeResponse>,
                     response: Response<RecipeResponse>
                 ) {
+                    if (!isAdded) return
                     showLoading(false)
-                    binding.btnRegenRecipe.isEnabled = true
 
                     if (response.isSuccessful) {
                         response.body()?.let { recipeResponse ->
                             val markdownResponse = recipeResponse.markdown
                             val extractedName = extractName(markdownResponse)
-
+                            recipeName = extractedName
                             currentRecipe = Recipe(
                                 id = UUID.randomUUID().toString(),
                                 name = extractedName,
@@ -102,24 +131,35 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
 
                             displayMarkdown(markdownResponse)
                             isRecipeValid = true
-                            binding.btnSaveRecipe.isEnabled = true
+                            binding.btnSaveRecipe.apply {
+                                isEnabled = true
+                                isClickable = true
+                                alpha = 1f
+                            }
                         }
                     } else {
-                        binding.textViewOutput.text = getString(R.string.network_error)
+                        if (isAdded) binding.textViewOutput.text = getString(R.string.network_error)
                         isRecipeValid = false
-                        binding.btnSaveRecipe.isEnabled = false
                     }
+
+                    (activity as MainActivity).setUpActionBarForTemporaryRecipes(true)
                 }
 
                 override fun onFailure(call: Call<RecipeResponse>, t: Throwable) {
-                    showLoading(false)  // Hide loading
+                    if (!isAdded) return
+                    showLoading(false)
                     binding.textViewOutput.text = getString(R.string.network_error)
-                    isRecipeValid = false  // Prevent saving
-                    binding.btnRegenRecipe.isEnabled = true  // Re-enable button
-                    binding.btnSaveRecipe.isEnabled = false
+                    isRecipeValid = false
+                    binding.btnSaveRecipe.apply {
+                        isEnabled = false
+                        isClickable = false
+                        alpha = 0.5f
+                    }
+                    (activity as MainActivity).setUpActionBarForTemporaryRecipes(true)
                 }
             })
     }
+
 
 
     private fun showLoading(isLoading: Boolean) {
@@ -132,9 +172,23 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
     }
 
     private fun extractName(markdownText: String): String {
-        val regex = Regex("^#\\s(.+)", RegexOption.MULTILINE)
-        val matchResult = regex.find(markdownText)
-        return matchResult?.groupValues?.get(1)?.trim() ?: getString(R.string.unnamed_recipe)
+        val regex = Regex("^#\\s?(.*)", RegexOption.MULTILINE)
+        val matches = regex.findAll(markdownText).toList()
+        return matches.lastOrNull()
+            ?.groupValues?.get(1)
+            ?.trim()?.removeSuffix(":")
+            ?: getString(R.string.unnamed_recipe)
+    }
+
+    private fun startCooldown() {
+        binding.btnRegenRecipe.apply {
+            isEnabled = false
+            isClickable = false
+            alpha = 0.5f
+            text = getString(R.string.please_wait_regen_block)
+        }
+
+        handler.postDelayed(enableButtonRunnable, 25_000)
     }
 
     private fun displayMarkdown(markdownText: String) {
@@ -160,5 +214,6 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        handler.removeCallbacks(enableButtonRunnable)
     }
 }

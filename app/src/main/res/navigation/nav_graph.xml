@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,7 +6,7 @@
 
     <fragment
         android:id="@+id/newRecipeFragment"
-        android:name="com.nikdi.recipefyai.recipes.NewRecipeFragment"
+        android:name="com.nikdi.recipefyai.logicrel.NewRecipeFragment"
         android:label="@string/create_new_recipe"
         tools:layout="@layout/fragment_new_recipe" >
 
@@ -21,7 +20,7 @@
 
     <fragment
         android:id="@+id/ingredientSelectionFragment"
-        android:name="com.nikdi.recipefyai.recipes.IngredientSelectionFragment"
+        android:name="com.nikdi.recipefyai.logicrel.IngredientSelectionFragment"
         android:label="@string/ingredients_title"
         tools:layout="@layout/fragment_ingredient_selection">
 
@@ -29,7 +28,7 @@
             android:name="imageUri"
             app:argType="string"
             app:nullable="true" />
-        <!-- Pass URI as a string -->
+
         <action
             android:id="@+id/action_ingredientSelectionFragment_to_temporaryRecipeFragment"
             app:destination="@id/temporaryRecipeFragment"
@@ -39,7 +38,7 @@
 
     <fragment
         android:id="@+id/temporaryRecipeFragment"
-        android:name="com.nikdi.recipefyai.recipes.TemporaryRecipeFragment"
+        android:name="com.nikdi.recipefyai.logicrel.TemporaryRecipeFragment"
         android:label="@string/cooking_title"
         tools:layout="@layout/fragment_temporary_recipe">
 
@@ -53,17 +52,10 @@
             <argument
                 android:name="portionSize"
                 app:argType="float" />
-
-            <action
-            android:id="@+id/action_temporaryRecipe_to_newRecipe"
-            app:destination="@id/newRecipeFragment"
-            app:popUpTo="@id/newRecipeFragment"
-            app:popUpToInclusive="true" />
     </fragment>
-
     <fragment
         android:id="@+id/displaySavedRecipeFragment"
-        android:name="com.nikdi.recipefyai.recipes.DisplaySavedRecipeFragment"
+        android:name="com.nikdi.recipefyai.logicrel.DisplaySavedRecipeFragment"
         tools:layout="@layout/fragment_display_saved_recipe">
     </fragment>
 </navigation>

@@ -1,4 +1,4 @@
-package com.nikdi.recipefyai.recipes
+package com.nikdi.recipefyai.logicrel
 
 import android.os.Bundle
 import android.view.LayoutInflater

@@ -1,0 +1,9 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/background"/>
+    <item>
+        <bitmap
+            android:src="@drawable/navview"
+            android:tileMode="disabled"
+            android:alpha="0.3"/>
+    </item>
+</layer-list>

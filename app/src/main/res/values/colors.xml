@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="transparent">#00FFFFFF</color>
     <color name="background">#FFFFFF</color>
     <color name="dialog_background">#D2D2D2</color>
     <color name="textColor">#000000</color>
-    <color name="buttonColor">#6200EE</color>
     <color name="toolbarColor">#00BCD4</color>
-    <color name="overlayColor">#191919</color>
-    <color name="green">#26CD2D</color>
-    <color name="transparent">#00FFFFFF</color>
+    <color name="overlayColor">#90000000</color>
+    <color name="green">#4CAF50</color>
+    <color name="blue">#2196F3</color>
+    <color name="teal">#009688</color>
+    <color name="red">#D32F2F</color>
+    <color name="gray">#707070</color>
+    <color name="purple">#BB86FC</color>
 </resources>

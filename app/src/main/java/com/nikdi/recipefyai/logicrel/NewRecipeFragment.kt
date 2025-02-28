@@ -1,4 +1,4 @@
-package com.nikdi.recipefyai.recipes
+package com.nikdi.recipefyai.logicrel
 
 import android.app.Activity
 import android.content.Intent

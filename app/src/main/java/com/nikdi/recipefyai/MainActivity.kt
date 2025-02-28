@@ -4,7 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.TextUtils
 import android.view.Menu
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
@@ -13,7 +15,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.findNavController
+import androidx.navigation.NavOptions
 import com.nikdi.recipefyai.utils.PermissionManager
 import com.nikdi.recipefyai.utils.PreferenceManager
 import com.nikdi.recipefyai.utils.RequiredPermissions
@@ -23,9 +25,9 @@ import androidx.navigation.ui.NavigationUI
 import com.google.android.material.navigation.NavigationView
 import com.nikdi.recipefyai.databinding.ActivityMainBinding
 import com.nikdi.recipefyai.dbrel.RecipeSummary
-import com.nikdi.recipefyai.recipes.IngredientSelectionFragment
-import com.nikdi.recipefyai.recipes.NewRecipeFragment
-import com.nikdi.recipefyai.recipes.TemporaryRecipeFragment
+import com.nikdi.recipefyai.logicrel.IngredientSelectionFragment
+import com.nikdi.recipefyai.logicrel.NewRecipeFragment
+import com.nikdi.recipefyai.logicrel.TemporaryRecipeFragment
 import com.nikdi.recipefyai.utils.CustomTypefaceSpan
 import com.nikdi.recipefyai.viewmodel.RecipeViewModel
 import kotlinx.coroutines.launch
@@ -49,6 +51,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        for (i in 0 until toolbar.childCount) {
+            val view = toolbar.getChildAt(i)
+            if (view is TextView) {
+                view.ellipsize = TextUtils.TruncateAt.MARQUEE
+                view.marqueeRepeatLimit = -1
+                view.isSingleLine = true
+                view.isSelected = true
+                break
+            }
+        }
 
         if (PermissionManager.checkPermissions(this, RequiredPermissions.permissions)) {
             proceedToApp()
@@ -123,7 +136,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //TODO set UI buttons as different colors and put README and LICENSE in git
+    //TODO put README and LICENSE in git
 
     private fun applyFontToMenu(menu: Menu) {
         val typeface = ResourcesCompat.getFont(this, R.font.comfortaa_variable)
@@ -249,25 +262,31 @@ class MainActivity : AppCompatActivity() {
                     drawerLayout.openDrawer(GravityCompat.START)
                 }
             }
-            is IngredientSelectionFragment -> {
+            is IngredientSelectionFragment, is TemporaryRecipeFragment -> {
                 binding.toolbar.setNavigationOnClickListener {
                     navController.popBackStack()
                 }
             }
-            is TemporaryRecipeFragment -> {
-                binding.toolbar.inflateMenu(R.menu.return_home)
+        }
+    }
 
-                binding.toolbar.setOnMenuItemClickListener { menuItem ->
-                    when (menuItem.itemId) {
-                        R.id.action_return_home -> {
-                            //findNavController().navigate()
-                            true
-                        } else -> false
-                    }
-                }
-
-                binding.toolbar.setNavigationOnClickListener {
-                    navController.popBackStack()
+    fun setUpActionBarForTemporaryRecipes(enable: Boolean) {
+        binding.toolbar.menu.clear()
+        if (enable) {
+            val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+            binding.toolbar.inflateMenu(R.menu.return_home)
+            binding.toolbar.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_return_home -> {
+                        navController.navigate(
+                            R.id.newRecipeFragment,
+                            null,
+                            NavOptions.Builder()
+                                .setPopUpTo(navController.graph.startDestinationId, true)
+                                .build()
+                        )
+                        true
+                    } else -> false
                 }
             }
         }

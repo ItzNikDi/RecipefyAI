@@ -1,4 +1,4 @@
-package com.nikdi.recipefyai.recipes
+package com.nikdi.recipefyai.logicrel
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -34,8 +34,7 @@ class RecipeNameDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = DialogRecipeNameBinding.inflate(layoutInflater)
 
-        val suggestedName =
-            arguments?.getString("suggestedName") ?: getString(R.string.unnamed_recipe)
+        val suggestedName = arguments?.getString("suggestedName")
         binding.recipeNameInput.setText(suggestedName)
 
         val dialog = AlertDialog.Builder(requireContext())

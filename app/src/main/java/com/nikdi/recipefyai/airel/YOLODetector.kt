@@ -2,7 +2,6 @@ package com.nikdi.recipefyai.airel
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.InterpreterApi
 import org.tensorflow.lite.support.common.FileUtil
@@ -26,7 +25,7 @@ class YOLODetector(
 ) {
 
     private var interpreter: InterpreterApi
-    private var gpuDelegate: GpuDelegate? = null // Store the delegate reference
+    private var gpuDelegate: GpuDelegate? = null
     private var labels = mutableListOf<String>()
     private var tensorWidth = 0
     private var tensorHeight = 0
@@ -45,11 +44,10 @@ class YOLODetector(
         val options = InterpreterApi.Options().apply {
             if (compatList.isDelegateSupportedOnThisDevice) {
                 val delegateOptions = compatList.bestOptionsForThisDevice
-                this.addDelegate(GpuDelegate(delegateOptions)) // Use GPU if available
+                this.addDelegate(GpuDelegate(delegateOptions))
             } else {
-                this.setNumThreads(Runtime.getRuntime().availableProcessors()) // if not, use multi-threading on CPU
+                this.setNumThreads(Runtime.getRuntime().availableProcessors())
             }
-            Log.d("Delegates", this.delegates.toString()) // TODO take a look at the delegate implementation
         }
 
         val model = FileUtil.loadMappedFile(context, modelPath)
@@ -72,7 +70,6 @@ class YOLODetector(
             tensorWidth = inputShape[1]
             tensorHeight = inputShape[2]
 
-            // If in case input shape is in format of [1, 3, ..., ...]
             if (inputShape[1] == 3) {
                 tensorWidth = inputShape[2]
                 tensorHeight = inputShape[3]

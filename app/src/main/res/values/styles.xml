@@ -13,4 +13,15 @@
         <item name="android:autoSizeStepGranularity">12sp</item>
         <item name="android:fontFamily">@font/comfortaa_variable</item>
     </style>
+    <style name="Widget.RecipefyAI.Button" parent="Widget.Material3.Button">
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.ExtraLarge</item>
+        <!--<item name="android:backgroundTint">@color/positive_action</item>-->
+        <item name="android:textColor">@color/textColor</item>
+    </style>
+    <style name="Widget.RecipefyAI.ImageButton" parent="Widget.Material3.Button.IconButton.Filled">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+    </style>
+
 </resources>

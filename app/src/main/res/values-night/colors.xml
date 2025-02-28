@@ -1,11 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background">#121212</color>
     <color name="dialog_background">#424242</color>
     <color name="textColor">#FFFFFF</color>
-    <color name="buttonColor">#BB86FC</color>
-    <color name="toolbarColor">#00BCD4</color>
-    <color name="overlayColor">#191919</color>
-    <color name="green">#26CD2D</color>
-    <color name="transparent">#00FFFFFF</color>
 </resources>

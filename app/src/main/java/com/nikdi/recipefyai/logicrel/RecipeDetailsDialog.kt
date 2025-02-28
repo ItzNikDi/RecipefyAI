@@ -1,4 +1,4 @@
-package com.nikdi.recipefyai.recipes
+package com.nikdi.recipefyai.logicrel
 
 import android.app.AlertDialog
 import android.app.Dialog

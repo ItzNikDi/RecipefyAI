@@ -1,4 +1,4 @@
-package com.nikdi.recipefyai.recipes
+package com.nikdi.recipefyai.logicrel
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -50,14 +50,11 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
 
         setupRecyclerView()
 
-        ingredientsList.clear()
-        ingredientsList.addAll(loadIngredients(requireContext()))
-
-        ingredientAdapter.notifyDataSetChanged()
+        loadInformation(requireContext())
 
         binding.root.post { updateEmptyOverlay() }
 
-        loadingOverlay = binding.loadingOverlay // Use binding to access the overlay
+        loadingOverlay = binding.loadingOverlay
 
         val imageUriString = args.imageUri
         val imageUri = imageUriString?.takeIf { it.isNotEmpty() }?.let { Uri.parse(it) }
@@ -70,7 +67,6 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
             }
         }
 
-        // Set up the add ingredient button click listener
         binding.addIngredientButton.setOnClickListener {
             val newIngredients = binding.ingredientInput.text.toString()
                 .split(",")
@@ -99,7 +95,6 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
             }
         }
 
-        // Handle Enter key press in the EditText
         binding.ingredientInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 binding.addIngredientButton.performClick()
@@ -117,6 +112,14 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
                     .setAnchorView(R.id.confirmIngredientsButton).show()
             }
         }
+
+        binding.removeAllButton.setOnClickListener {
+            ingredientsList.clear()
+            ingredientAdapter.notifyDataSetChanged()
+            updateEmptyOverlay()
+            selectedServings = null
+            selectedPortionSize = null
+        }
     }
 
     private fun updateEmptyOverlay(message: String = getString(R.string.no_added_ingredients)) {
@@ -125,15 +128,15 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
                 binding.emptyMessage.text = message
                 binding.emptyMessage.alpha = 0f
                 binding.emptyMessage.visibility = View.VISIBLE
-                binding.emptyMessage.animate().cancel() // Cancel ongoing animations
-                binding.emptyMessage.animate().alpha(1f).setDuration(150).start() // Fade in
+                binding.emptyMessage.animate().cancel()
+                binding.emptyMessage.animate().alpha(1f).setDuration(150).start()
             }
         } else {
             if (binding.emptyMessage.visibility == View.VISIBLE) {
                 binding.emptyMessage.animate().cancel()
                 binding.emptyMessage.animate().alpha(0f).setDuration(150).withEndAction {
                     binding.emptyMessage.visibility = View.GONE
-                }.start() // Fade out
+                }.start()
             }
         }
     }
@@ -148,23 +151,29 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
         dialog.show(childFragmentManager, "RecipeDetailsDialog")
     }
 
-    private fun saveIngredients(ingredients: List<String>, context: Context) {
-        val sharedPreferences = context.getSharedPreferences("IngredientPrefs", Context.MODE_PRIVATE)
+    private fun saveInformation(ingredients: List<String>, servings: String, portionSize: String, context: Context) {
+        val sharedPreferences = context.getSharedPreferences("InformationPrefs", Context.MODE_PRIVATE)
         sharedPreferences.edit()
             .putStringSet("ingredients", ingredients.toSet())
+            .putString("servings", servings)
+            .putString("portion_size", portionSize)
             .apply()
     }
 
-    private fun loadIngredients(context: Context): List<String> {
-        val sharedPreferences = context.getSharedPreferences("IngredientPrefs", Context.MODE_PRIVATE)
-        return sharedPreferences.getStringSet("ingredients", emptySet())?.toList() ?: emptyList()
+    private fun loadInformation(context: Context) {
+        val sharedPreferences = context.getSharedPreferences("InformationPrefs", Context.MODE_PRIVATE)
+        ingredientsList.clear()
+        ingredientsList.addAll(sharedPreferences.getStringSet("ingredients", emptySet())?.toList() ?: emptyList())
+        ingredientAdapter.notifyDataSetChanged()
+        selectedServings = sharedPreferences.getString("servings", null)
+        selectedPortionSize = sharedPreferences.getString("portion_size", null)
     }
 
     private suspend fun initModel() {
         withContext(Dispatchers.IO) {
             yoloDetector = YOLODetector(
                 context = requireContext(),
-                modelPath = "internet.tflite", // TODO introduce the model
+                modelPath = "internet.tflite",
                 labelPath = "labels.txt",
                 detectorListener = this@IngredientSelectionFragment,
                 message = { msg -> Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show() }
@@ -184,11 +193,11 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
                                 try {
                                     yoloDetector?.detect(bitmap)
                                     withContext(Dispatchers.Main) {
-                                        showLoading(false) // Hide loading after inference is done
+                                        showLoading(false)
                                     }
                                 } catch (e: Exception) {
                                     withContext(Dispatchers.Main) {
-                                        showLoading(false) // Ensure it hides even if an error occurs
+                                        showLoading(false)
                                         Snackbar.make(binding.root, getString(R.string.inference_error), Snackbar.LENGTH_SHORT).show()
                                     }
                                 }
@@ -196,7 +205,7 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
                         }
                     },
                     onError = {
-                        showLoading(false) // Hide loading if an error happens
+                        showLoading(false)
                         Snackbar.make(binding.root, getString(R.string.inference_error), Snackbar.LENGTH_SHORT).show()
                     }
                 )
@@ -216,7 +225,7 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
     override fun onDetect(boundingBoxes: List<BoundingBox>) {
         coroutineScope.launch(Dispatchers.Main) {
             ingredientsList.addAll(boundingBoxes.map { it.clsName })
-            ingredientAdapter.removeDuplicates() // Handle duplicates if necessary
+            ingredientAdapter.removeDuplicates()
             ingredientAdapter.notifyDataSetChanged()
             updateEmptyOverlay()
         }
@@ -247,7 +256,12 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
 
     override fun onPause() {
         super.onPause()
-        saveIngredients(ingredientsList, requireContext())
+        saveInformation(
+            ingredientsList,
+            selectedServings ?: "",
+            selectedPortionSize ?: "",
+            requireContext()
+        )
     }
 
     override fun onDestroyView() {

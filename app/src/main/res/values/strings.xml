@@ -3,6 +3,7 @@
     <string name="proceed">Продължете напред</string>
     <string name="enter_hint">въведи тук</string>
     <string name="cancel">Откажи</string>
+    <string name="please_wait_regen_block">Моля, изчакайте…</string>
     <string name="new_recipe">Нова рецепта</string>
     <string name="open_sidebar">Отвори менюто с рецепти</string>
     <string name="close_sidebar">Затвори менюто с рецепти</string>
@@ -40,4 +41,8 @@
     <string name="saved_recipes">Запазени рецепти</string>
     <string name="delete_recipe">Изтрий рецептата</string>
     <string name="go_home">Върни се в началото</string>
+    <string name="clear_all_ingredients">Премахни всички съставки</string>
+    <string name="permissions_needed">Необходими разрешения</string>
+    <string name="allow_the_app_the_permissions">Моля позволете на приложението необходимите разрешения!</string>
+    <string name="go_to_settings">Отиди в Настройки</string>
 </resources>

@@ -1,50 +1,64 @@
-<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:orientation="vertical">
 
-    <!-- Container for the buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:gravity="center_horizontal"
+        android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Text describing the action -->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="90dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
             android:text="@string/choose_method"
             android:textAppearance="@style/TextAppearance.RecipefyAI.Large"
-            android:layout_marginTop="90dp"
-            android:textColor="@color/textColor"
-            android:gravity="center"
-            android:layout_marginBottom="20dp" />
-
-        <!-- Button: From Photo -->
-        <Button
-            android:id="@+id/btnFromPhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/from_photo"
-            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
-            android:textColor="@color/textColor"
-            android:backgroundTint="@color/buttonColor"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Button: From Text -->
-        <Button
-            android:id="@+id/btnFromText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
-            android:backgroundTint="@color/buttonColor"
-            android:text="@string/from_text"
             android:textColor="@color/textColor" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFromPhoto"
+            style="@style/Widget.RecipefyAI.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/blue"
+            android:text="@string/from_photo"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
+            app:icon="@drawable/ic_gallery"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:iconSize="24dp"
+            app:iconTint="@color/textColor" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFromText"
+            style="@style/Widget.RecipefyAI.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/green"
+            android:text="@string/from_text"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
+            app:icon="@drawable/ic_keyboard"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:iconSize="24dp"
+            app:iconTint="@color/textColor" />
+
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/new_recipe_background" />
 
 </FrameLayout>

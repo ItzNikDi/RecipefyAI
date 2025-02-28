@@ -9,6 +9,7 @@ import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.nikdi.recipefyai.R
 
 object PermissionManager {
 
@@ -26,15 +27,15 @@ object PermissionManager {
 
     fun showSettingsDialog(context: Context, activity: Activity) {
         AlertDialog.Builder(context)
-            .setTitle("Необходими разрешения")
-            .setMessage("Моля позволете на приложението необходимите разрешения!")
-            .setPositiveButton("Отиди в Настройки") { _, _ ->
+            .setTitle(context.getString(R.string.permissions_needed))
+            .setMessage(context.getString(R.string.allow_the_app_the_permissions))
+            .setPositiveButton(context.getString(R.string.go_to_settings)) { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", activity.packageName, null)
                 }
                 activity.startActivity(intent)
             }
-            .setNegativeButton("Откажи", null)
+            .setNegativeButton(context.getString(R.string.cancel), null)
             .show()
     }
 

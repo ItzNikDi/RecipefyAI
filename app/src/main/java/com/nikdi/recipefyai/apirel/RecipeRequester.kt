@@ -10,14 +10,12 @@ interface RecipeRequester {
     fun generateRecipe(@Body request: RecipeRequest): Call<RecipeResponse>
 }
 
-// Request Model
 data class RecipeRequest(
     @SerializedName("ingredients") val ingredients: List<String>,
     @SerializedName("servings") val servings: Int,
     @SerializedName("portion_size") val portionSize: Float
 )
 
-// Response Model
 data class RecipeResponse(
     @SerializedName("markdown") val markdown: String,
 )

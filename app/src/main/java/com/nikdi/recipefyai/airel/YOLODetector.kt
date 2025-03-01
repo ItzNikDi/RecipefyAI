@@ -2,6 +2,7 @@ package com.nikdi.recipefyai.airel
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.InterpreterApi
 import org.tensorflow.lite.support.common.FileUtil
@@ -13,6 +14,7 @@ import com.nikdi.recipefyai.airel.LabelLoader.extractNamesFromMetadata
 import com.nikdi.recipefyai.utils.ImageHandler
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
+import org.tensorflow.lite.gpu.GpuDelegateFactory.Options
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
@@ -39,19 +41,14 @@ class YOLODetector(
 
     init {
 
-        val compatList = CompatibilityList()
-
-        val options = InterpreterApi.Options().apply {
-            if (compatList.isDelegateSupportedOnThisDevice) {
-                val delegateOptions = compatList.bestOptionsForThisDevice
-                this.addDelegate(GpuDelegate(delegateOptions))
-            } else {
-                this.setNumThreads(Runtime.getRuntime().availableProcessors())
-            }
+        val newerOptions = InterpreterApi.Options().apply {
+            gpuDelegate = GpuDelegate(CompatibilityList().bestOptionsForThisDevice)
+            this.addDelegate(gpuDelegate)
+            Log.d("Delegates", this.delegates.toString())
         }
 
         val model = FileUtil.loadMappedFile(context, modelPath)
-        interpreter = InterpreterApi.create(model, options)
+        interpreter = InterpreterApi.create(model, newerOptions)
 
         val inputShape = interpreter.getInputTensor(0)?.shape()
         val outputShape = interpreter.getOutputTensor(0)?.shape()
@@ -94,7 +91,6 @@ class YOLODetector(
             || numElements == 0) {
             return
         }
-
         val tensorImage = TensorImage(INPUT_IMAGE_TYPE)
         tensorImage.load(ImageHandler().resizeImage(frame, tensorWidth, tensorHeight))
         val processedImage = imageProcessor.process(tensorImage)
@@ -109,7 +105,6 @@ class YOLODetector(
             detectorListener.onEmptyDetect()
             return
         }
-
         detectorListener.onDetect(bestBoxes)
     }
 
@@ -204,7 +199,7 @@ class YOLODetector(
         private const val INPUT_STANDARD_DEVIATION = 255f
         private val INPUT_IMAGE_TYPE = DataType.FLOAT32
         private val OUTPUT_IMAGE_TYPE = DataType.FLOAT32
-        private const val CONFIDENCE_THRESHOLD = 0.3F
+        private const val CONFIDENCE_THRESHOLD = 0.45F
         private const val IOU_THRESHOLD = 0.3F
     }
 }

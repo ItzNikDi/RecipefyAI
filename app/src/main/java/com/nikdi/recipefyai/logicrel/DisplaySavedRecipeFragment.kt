@@ -30,7 +30,6 @@ class DisplaySavedRecipeFragment: Fragment() {
             recipe?.let {
                 displayMarkdown(recipe.preparation)
                 binding.vertScrollView.isSmoothScrollingEnabled = true
-                binding.textViewOutput.setHorizontallyScrolling(true)
                 (activity as MainActivity).supportActionBar?.title = recipe.name
             }
         }
@@ -38,12 +37,6 @@ class DisplaySavedRecipeFragment: Fragment() {
         (activity as MainActivity).setUpActionBarForSavedRecipes(recipeId)
 
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.vertScrollView.isSmoothScrollingEnabled = true
-        binding.textViewOutput.setHorizontallyScrolling(true)
     }
 
     private fun displayMarkdown(markdownText: String) {

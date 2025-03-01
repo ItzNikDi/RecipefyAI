@@ -85,7 +85,6 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
         }
 
         binding.vertScrollView.isSmoothScrollingEnabled = true
-        binding.textViewOutput.setHorizontallyScrolling(true)
     }
 
     private fun sendRecipeToServer(recipeRequest: RecipeRequest) {
@@ -173,9 +172,8 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
 
     private fun extractName(markdownText: String): String {
         val regex = Regex("^#\\s?(.*)", RegexOption.MULTILINE)
-        val matches = regex.findAll(markdownText).toList()
-        return matches.lastOrNull()
-            ?.groupValues?.get(1)
+        val match = regex.find(markdownText)
+        return match?.groupValues?.get(1)
             ?.trim()?.removeSuffix(":")
             ?: getString(R.string.unnamed_recipe)
     }

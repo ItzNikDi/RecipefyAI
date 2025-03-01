@@ -1,6 +1,7 @@
 package com.nikdi.recipefyai
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -274,7 +275,7 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.menu.clear()
         if (enable) {
             val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
-            binding.toolbar.inflateMenu(R.menu.return_home)
+            binding.toolbar.inflateMenu(R.menu.return_home_menu)
             binding.toolbar.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.action_return_home -> {
@@ -294,7 +295,7 @@ class MainActivity : AppCompatActivity() {
 
     fun setUpActionBarForSavedRecipes(recipeId: String) {
         binding.toolbar.menu.clear()
-        binding.toolbar.inflateMenu(R.menu.recipe_context_menu)
+        binding.toolbar.inflateMenu(R.menu.delete_recipe_menu)
 
         binding.toolbar.setNavigationOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)

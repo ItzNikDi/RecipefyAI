@@ -3,7 +3,7 @@
     <item>
         <bitmap
             android:src="@drawable/navview"
-            android:tileMode="disabled"
+            android:tileMode="clamp"
             android:alpha="0.3"/>
     </item>
 </layer-list>

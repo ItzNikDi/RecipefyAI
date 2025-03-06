@@ -2,11 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/dialog_background">
+    android:background="@color/dialog_background"
+    android:gravity="center_horizontal">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/titleConstraintLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/gradient_purple_blue"
         android:padding="10dp"
@@ -16,28 +17,55 @@
 
         <TextView
             android:id="@+id/dialogTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/details_title"
+            android:text="@string/create_from_name"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.RecipefyAI.Large"
             android:textColor="@color/textColor"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/titleConstraintLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/titleConstraintLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/name"
+        android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
+        android:textColor="@color/textColor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleConstraintLayout" />
+
+    <EditText
+        android:id="@+id/recipeNameInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:backgroundTint="@color/textColor"
+        android:hint="@string/enter_hint"
+        android:inputType="text"
+        android:padding="8dp"
+        android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
+        android:textColor="@color/textColor"
+        android:textColorHint="@color/textColor"
+        app:layout_constraintBaseline_toBaselineOf="@id/tvName"
+        app:layout_constraintStart_toEndOf="@id/tvName"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputConstraintLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/btnProceed"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titleConstraintLayout">
+        app:layout_constraintTop_toBottomOf="@id/recipeNameInput">
 
         <TextView
             android:id="@+id/tvServings"
@@ -74,9 +102,9 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="12dp"
             android:text="@string/portion_size"
+            android:textAlignment="textEnd"
             android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
             android:textColor="@color/textColor"
-            android:textAlignment="textEnd"
             app:layout_constraintEnd_toStartOf="@id/portionSizeInput"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvServings" />
@@ -99,46 +127,54 @@
             app:layout_constraintStart_toEndOf="@id/tvPortionSize" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnProceed"
-        style="@style/Widget.RecipefyAI.Button"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/buttonBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="6dp"
-        android:backgroundTint="@color/green"
-        android:paddingHorizontal="12dp"
-        android:text="@string/proceed"
-        android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
-        app:icon="@drawable/ic_proceed"
-        app:iconGravity="textEnd"
-        app:iconPadding="8dp"
-        app:iconSize="24dp"
-        app:iconTint="@color/textColor"
-        app:layout_constraintBottom_toTopOf="@id/btnCancel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputConstraintLayout" />
+        app:layout_constraintTop_toBottomOf="@id/inputConstraintLayout">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCancel"
-        style="@style/Widget.RecipefyAI.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="3dp"
-        android:layout_marginBottom="12dp"
-        android:backgroundTint="@color/red"
-        android:paddingHorizontal="12dp"
-        android:text="@string/cancel"
-        android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
-        app:icon="@drawable/ic_remove"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconSize="24dp"
-        app:iconTint="@color/textColor"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnProceed" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnProceed"
+            style="@style/Widget.RecipefyAI.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/green"
+            android:paddingHorizontal="12dp"
+            android:text="@string/proceed"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
+            app:icon="@drawable/ic_proceed"
+            app:iconPadding="8dp"
+            app:iconSize="24dp"
+            app:iconTint="@color/textColor"
+            app:iconGravity="textEnd"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            style="@style/Widget.RecipefyAI.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/red"
+            android:paddingHorizontal="12dp"
+            android:text="@string/cancel"
+            android:textAppearance="@style/TextAppearance.RecipefyAI.Normal"
+            app:icon="@drawable/ic_remove"
+            app:iconPadding="8dp"
+            app:iconSize="24dp"
+            app:iconTint="@color/textColor"
+            app:iconGravity="textStart"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnProceed" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

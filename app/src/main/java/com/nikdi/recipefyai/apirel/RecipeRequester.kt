@@ -6,12 +6,20 @@ import retrofit2.http.POST
 import com.google.gson.annotations.SerializedName
 
 interface RecipeRequester {
-    @POST("generate")
-    fun generateRecipe(@Body request: RecipeRequest): Call<RecipeResponse>
+    @POST("ingredients")
+    fun generateFromIngredients(@Body request: FromIngredientsRequest): Call<RecipeResponse>
+    @POST("name")
+    fun generateFromName(@Body request: FromNameRequest): Call<RecipeResponse>
 }
 
-data class RecipeRequest(
+data class FromIngredientsRequest(
     @SerializedName("ingredients") val ingredients: List<String>,
+    @SerializedName("servings") val servings: Int,
+    @SerializedName("portion_size") val portionSize: Float
+)
+
+data class FromNameRequest(
+    @SerializedName("name") val name: String,
     @SerializedName("servings") val servings: Int,
     @SerializedName("portion_size") val portionSize: Float
 )

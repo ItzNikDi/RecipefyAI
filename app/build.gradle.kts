@@ -14,7 +14,7 @@ android {
         minSdk = 29
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -62,8 +61,6 @@ dependencies {
     implementation(libs.litert.api)
     implementation(libs.litert.gpu)
     implementation(libs.litert.gpu.api)
-    //implementation(libs.litert.gpu.delegate.plugin)
     implementation(libs.litert.support.api)
     implementation(libs.litert.metadata)
-    //implementation(libs.tensorflow.lite.select.tf.ops)
 }

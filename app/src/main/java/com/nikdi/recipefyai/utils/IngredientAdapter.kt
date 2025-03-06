@@ -14,7 +14,7 @@ class IngredientAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(ingredient: String, position: Int) {
             binding.ingredientText.text = ingredient
-            binding.btnRemove.setOnClickListener() {
+            binding.btnRemove.setOnClickListener {
                 onRemoveClick(position)
             }
         }

@@ -14,16 +14,15 @@ import com.nikdi.recipefyai.airel.LabelLoader.extractNamesFromMetadata
 import com.nikdi.recipefyai.utils.ImageHandler
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
-import org.tensorflow.lite.gpu.GpuDelegateFactory.Options
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
 class YOLODetector(
-    private val context: Context,
-    private val modelPath: String,
-    private val labelPath: String?,
+    context: Context,
+    modelPath: String,
+    labelPath: String?,
     private val detectorListener: DetectorListener,
-    private val message: (String) -> Unit
+    message: (String) -> Unit
 ) {
 
     private var interpreter: InterpreterApi

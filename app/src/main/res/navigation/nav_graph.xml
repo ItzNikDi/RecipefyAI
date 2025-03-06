@@ -15,7 +15,11 @@
             app:destination="@id/ingredientSelectionFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"/>
-
+        <action
+            android:id="@+id/action_newRecipeFragment_to_temporaryRecipeFragment"
+            app:destination="@id/temporaryRecipeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"/>
     </fragment>
 
     <fragment
@@ -44,8 +48,12 @@
 
             <argument
                 android:name="ingredients"
-                app:argType="string[]" />
-
+                app:argType="string[]"
+                app:nullable="true"/>
+            <argument
+                android:name="name"
+                app:argType="string"
+                app:nullable="true"/>
             <argument
                 android:name="servings"
                 app:argType="integer" />

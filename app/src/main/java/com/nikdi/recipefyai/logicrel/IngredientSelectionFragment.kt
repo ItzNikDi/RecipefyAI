@@ -24,6 +24,9 @@ import com.nikdi.recipefyai.airel.YOLODetector
 import com.nikdi.recipefyai.databinding.FragmentIngredientSelectionBinding
 import com.nikdi.recipefyai.utils.IngredientAdapter
 import kotlinx.coroutines.*
+import androidx.core.view.isVisible
+import androidx.core.content.edit
+import androidx.core.net.toUri
 
 class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, RecipeDetailsDialog.RecipeDetailsListener {
     private var _binding: FragmentIngredientSelectionBinding? = null
@@ -57,7 +60,7 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
         loadingOverlay = binding.loadingOverlay
 
         val imageUriString = args.imageUri
-        val imageUri = imageUriString?.takeIf { it.isNotEmpty() }?.let { Uri.parse(it) }
+        val imageUri = imageUriString?.takeIf { it.isNotEmpty() }?.toUri()
 
         if (imageUri != null) {
             coroutineScope.launch(Dispatchers.IO) {
@@ -106,7 +109,8 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
 
         binding.confirmIngredientsButton.setOnClickListener {
             if (ingredientsList.isNotEmpty()) {
-                showDetailsDialog()
+                RecipeDetailsDialog.newInstance(selectedServings, selectedPortionSize)
+                .show(childFragmentManager, "RecipeDetailsDialog")
             } else {
                 Snackbar.make(view, getString(R.string.no_added_ingredients), Snackbar.LENGTH_SHORT)
                     .setAnchorView(R.id.confirmIngredientsButton).show()
@@ -114,11 +118,15 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
         }
 
         binding.removeAllButton.setOnClickListener {
-            ingredientsList.clear()
-            ingredientAdapter.notifyDataSetChanged()
-            updateEmptyOverlay()
-            selectedServings = null
-            selectedPortionSize = null
+            if (ingredientsList.isNotEmpty()) {
+                ConfirmationDialog {
+                    ingredientsList.clear()
+                    ingredientAdapter.notifyDataSetChanged()
+                    updateEmptyOverlay()
+                    selectedServings = null
+                    selectedPortionSize = null
+                }.show(childFragmentManager, "ConfirmationDialog")
+            }
         }
     }
 
@@ -132,7 +140,7 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
                 binding.emptyMessage.animate().alpha(1f).setDuration(150).start()
             }
         } else {
-            if (binding.emptyMessage.visibility == View.VISIBLE) {
+            if (binding.emptyMessage.isVisible) {
                 binding.emptyMessage.animate().cancel()
                 binding.emptyMessage.animate().alpha(0f).setDuration(150).withEndAction {
                     binding.emptyMessage.visibility = View.GONE
@@ -146,18 +154,13 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
         binding.loadingOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
-    private fun showDetailsDialog() {
-        val dialog = RecipeDetailsDialog.newInstance(selectedServings, selectedPortionSize)
-        dialog.show(childFragmentManager, "RecipeDetailsDialog")
-    }
-
     private fun saveInformation(ingredients: List<String>, servings: String, portionSize: String, context: Context) {
         val sharedPreferences = context.getSharedPreferences("InformationPrefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit()
-            .putStringSet("ingredients", ingredients.toSet())
-            .putString("servings", servings)
-            .putString("portion_size", portionSize)
-            .apply()
+        sharedPreferences.edit {
+            putStringSet("ingredients", ingredients.toSet())
+                .putString("servings", servings)
+                .putString("portion_size", portionSize)
+        }
     }
 
     private fun loadInformation(context: Context) {
@@ -249,6 +252,7 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
         val action = IngredientSelectionFragmentDirections
             .actionIngredientSelectionFragmentToTemporaryRecipeFragment(
                 ingredientsList.toTypedArray(),
+                name = null,
                 servings.toInt(),
                 portionSize.toFloat())
         findNavController().navigate(action)

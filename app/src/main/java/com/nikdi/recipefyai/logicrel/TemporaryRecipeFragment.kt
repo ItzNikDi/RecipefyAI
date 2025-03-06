@@ -12,7 +12,8 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.nikdi.recipefyai.MainActivity
 import com.nikdi.recipefyai.R
-import com.nikdi.recipefyai.apirel.RecipeRequest
+import com.nikdi.recipefyai.apirel.FromIngredientsRequest
+import com.nikdi.recipefyai.apirel.FromNameRequest
 import com.nikdi.recipefyai.apirel.RecipeResponse
 import com.nikdi.recipefyai.apirel.RetrofitClient
 import com.nikdi.recipefyai.databinding.FragmentTemporaryRecipeBinding
@@ -60,11 +61,20 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
         loadingOverlay = binding.loadingOverlay
         showLoading(true)
 
-        val recipeRequest =
-            RecipeRequest(args.ingredients.toList(), args.servings, args.portionSize)
+        val recipeRequest: Any? = when {
+            args.ingredients != null -> FromIngredientsRequest(
+                args.ingredients!!.toList(), args.servings, args.portionSize
+            )
+            args.name != null -> FromNameRequest(
+                args.name!!, args.servings, args.portionSize
+            )
+            else -> null
+        }
 
-        startCooldown()
-        sendRecipeToServer(recipeRequest)
+        if(recipeRequest != null) {
+            startCooldown()
+            sendRequestToServer(recipeRequest)
+        }
 
         (activity as MainActivity).setUpActionBarForFragment(this)
         (activity as MainActivity).setUpActionBarForTemporaryRecipes(false)
@@ -80,14 +90,17 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
         }
 
         binding.btnRegenRecipe.setOnClickListener {
-            startCooldown()
-            sendRecipeToServer(recipeRequest)
+            if (recipeRequest != null) {
+                startCooldown()
+                sendRequestToServer(recipeRequest)
+            }
         }
 
         binding.vertScrollView.isSmoothScrollingEnabled = true
     }
 
-    private fun sendRecipeToServer(recipeRequest: RecipeRequest) {
+
+    private fun sendRequestToServer(recipeRequest: Any) {
         showLoading(true)
 
         binding.btnRegenRecipe.apply {
@@ -103,8 +116,13 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
 
         (activity as MainActivity).setUpActionBarForTemporaryRecipes(false)
 
-        RetrofitClient.apiService.generateRecipe(recipeRequest)
-            .enqueue(object : Callback<RecipeResponse> {
+        val call: Call<RecipeResponse> = when (recipeRequest) {
+            is FromIngredientsRequest -> RetrofitClient.apiService.generateFromIngredients(recipeRequest)
+            is FromNameRequest -> RetrofitClient.apiService.generateFromName(recipeRequest)
+            else -> return
+        }
+
+        call.enqueue(object : Callback<RecipeResponse> {
                 override fun onResponse(
                     call: Call<RecipeResponse>,
                     response: Response<RecipeResponse>
@@ -116,11 +134,11 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
                         response.body()?.let { recipeResponse ->
                             val markdownResponse = recipeResponse.markdown
                             val extractedName = extractName(markdownResponse)
-                            recipeName = extractedName
+                            recipeName = args.name ?: extractedName
                             currentRecipe = Recipe(
                                 id = UUID.randomUUID().toString(),
                                 name = extractedName,
-                                ingredients = args.ingredients.toList(),
+                                ingredients = args.ingredients?.toList() ?: emptyList(),
                                 servings = args.servings,
                                 portionSize = args.portionSize,
                                 preparation = markdownResponse,
@@ -171,7 +189,7 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
     }
 
     private fun extractName(markdownText: String): String {
-        val regex = Regex("^#\\s?(.*)", RegexOption.MULTILINE)
+        val regex = Regex("^#+\\s?(.*)", RegexOption.MULTILINE)
         val match = regex.find(markdownText)
         return match?.groupValues?.get(1)
             ?.trim()?.removeSuffix(":")

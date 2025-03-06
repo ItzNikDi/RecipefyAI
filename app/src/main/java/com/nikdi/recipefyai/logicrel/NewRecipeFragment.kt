@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.nikdi.recipefyai.MainActivity
 import com.nikdi.recipefyai.databinding.FragmentNewRecipeBinding
 
-class NewRecipeFragment : Fragment() {
+class NewRecipeFragment : Fragment(), FromNameDialog.FromNameListener {
     private var _binding: FragmentNewRecipeBinding? = null
     private val binding get() = _binding!!
 
@@ -41,6 +41,11 @@ class NewRecipeFragment : Fragment() {
             findNavController().navigate(action)
         }
 
+        binding.btnFromName.setOnClickListener {
+            val dialog = FromNameDialog()
+            dialog.show(childFragmentManager, "FromNameDialog")
+        }
+
         galleryResultLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -52,6 +57,16 @@ class NewRecipeFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onProceed(name: String, servings: String, portionSize: String) {
+        val action = NewRecipeFragmentDirections
+            .actionNewRecipeFragmentToTemporaryRecipeFragment(
+                ingredients = null,
+                name,
+                servings.toInt(),
+                portionSize.toFloat())
+        findNavController().navigate(action)
     }
 
     private fun openGallery() {

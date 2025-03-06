@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Recipefy.AI</string>
     <string name="proceed">Продължете напред</string>
+    <string name="yes">Да</string>
+    <string name="no">Не</string>
     <string name="enter_hint">въведи тук</string>
     <string name="cancel">Откажи</string>
     <string name="please_wait_regen_block">Моля, изчакайте…</string>
@@ -10,12 +12,15 @@
     <string name="inference_wait">Разпознаваме вашите продукти…</string>
     <string name="server_response_wait">Създаваме вашата рецепта…</string>
     <string name="network_error">Мрежова грешка. Моля, опитайте отново!</string>
-    <string name="choose_method">От какво бихте желали да подберете продуктите?</string>
+    <string name="choose_method">От какво бихте желали да създадете рецептата?</string>
     <string name="from_photo">От снимка</string>
     <string name="from_text">От текст</string>
+    <string name="from_name">От име</string>
     <string name="ingredients_title">Подбор на съставки</string>
     <string name="details_title">Въведете детайли за рецептата</string>
     <string name="enter_name_title">Въведете име за рецептата</string>
+    <string name="create_from_name">Създайте рецепта от името ѝ</string>
+    <string name="confirm_title">Внимание!</string>
     <string name="cooking_title">Предложение за рецепта</string>
     <string name="create_new_recipe">Създай нова рецепта</string>
     <string name="list_old_recipes">Покажи създадени рецепти</string>
@@ -27,8 +32,10 @@
     <string name="duplicate_ingredient">Тази съставка вече е добавена!</string>
     <string name="inference_error">Срещнахме грешка :(</string>
     <string name="no_ingredients_found">Не намерихме никакви продукти, моля добавете ги ръчно!</string>
+    <string name="irreversible_action">Това действие е необратимо!\nСигурни ли сте в избора си?</string>
     <string name="servings">Порции:</string>
-    <string name="portion_size">Грамаж:</string>
+    <string name="name">Име:</string>
+    <string name="portion_size">Грамаж\n(на порция):</string>
     <string name="servings_empty">Моля въведете брой порции!</string>
     <string name="portion_size_empty">Моля въведете размер на порцията!</string>
     <string name="regenerate_recipe">Създай друга рецепта</string>

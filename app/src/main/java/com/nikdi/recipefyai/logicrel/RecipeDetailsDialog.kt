@@ -11,7 +11,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.nikdi.recipefyai.databinding.DialogRecipeDetailsBinding
 import com.nikdi.recipefyai.R
 
-class RecipeDetailsDialog() : DialogFragment() {
+class RecipeDetailsDialog : DialogFragment() {
 
     private var _binding: DialogRecipeDetailsBinding? = null
     private val binding get() = _binding!!

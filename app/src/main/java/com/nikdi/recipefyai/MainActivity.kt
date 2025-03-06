@@ -1,7 +1,6 @@
 package com.nikdi.recipefyai
 
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -10,12 +9,14 @@ import android.view.Menu
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import com.nikdi.recipefyai.utils.PermissionManager
 import com.nikdi.recipefyai.utils.PreferenceManager
@@ -32,6 +33,9 @@ import com.nikdi.recipefyai.logicrel.TemporaryRecipeFragment
 import com.nikdi.recipefyai.utils.CustomTypefaceSpan
 import com.nikdi.recipefyai.viewmodel.RecipeViewModel
 import kotlinx.coroutines.launch
+import androidx.core.view.size
+import androidx.core.view.get
+import com.nikdi.recipefyai.logicrel.ConfirmationDialog
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: RecipeViewModel
@@ -42,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
     private var alreadyProceeded = false
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +69,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+
         if (PermissionManager.checkPermissions(this, RequiredPermissions.permissions)) {
             proceedToApp()
         } else {
@@ -82,9 +89,6 @@ class MainActivity : AppCompatActivity() {
 
         setupDrawer()
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
         appBarConfiguration = AppBarConfiguration(setOf(R.id.newRecipeFragment, R.id.displaySavedRecipeFragment), drawerLayout)
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
@@ -143,12 +147,11 @@ class MainActivity : AppCompatActivity() {
         val typeface = ResourcesCompat.getFont(this, R.font.comfortaa_variable)
 
         fun applyFontToItems(menu: Menu) {
-            for (i in 0 until menu.size()) {
-                val menuItem = menu.getItem(i)
+            for (i in 0 until menu.size) {
+                val menuItem = menu[i]
                 val spannableString = SpannableString(menuItem.title)
                 spannableString.setSpan(CustomTypefaceSpan("", typeface!!), 0, spannableString.length, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
                 menuItem.title = spannableString
-
                 if (menuItem.hasSubMenu()) {
                     applyFontToItems(menuItem.subMenu!!)
                 }
@@ -171,6 +174,7 @@ class MainActivity : AppCompatActivity() {
             val spannableString = SpannableString(menuItem.title)
             spannableString.setSpan(CustomTypefaceSpan("", typeface!!), 0, spannableString.length, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
             menuItem.title = spannableString
+            menuItem.icon = AppCompatResources.getDrawable(this, R.drawable.ic_gallery)
             menuItem.setOnMenuItemClickListener {
                 openRecipe(recipe.id)
                 drawerLayout.closeDrawer(GravityCompat.START)
@@ -183,14 +187,13 @@ class MainActivity : AppCompatActivity() {
         viewModel.viewModelScope.launch {
             viewModel.deleteRecipeById(recipeId)
         }
-        navigateTo(R.id.newRecipeFragment)
     }
 
     private fun openRecipe(recipeId: String) {
         val bundle = Bundle().apply {
             putString("recipe_id", recipeId)
         }
-        (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController.navigate(R.id.displaySavedRecipeFragment, bundle)
+        navController.navigate(R.id.displaySavedRecipeFragment, bundle)
         saveLastFragment(R.id.displaySavedRecipeFragment, recipeId)
     }
 
@@ -200,9 +203,6 @@ class MainActivity : AppCompatActivity() {
 
         if (preferenceManager.isFirstRun()) preferenceManager.setFirstRun(false)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-
         if (navController.currentDestination?.id != R.id.newRecipeFragment) {
             navController.popBackStack()
             navController.navigate(R.id.newRecipeFragment)
@@ -210,7 +210,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun navigateTo(destinationId: Int) {
-        val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
         saveLastFragment(destinationId)
         navController.navigate(destinationId)
     }
@@ -230,7 +229,6 @@ class MainActivity : AppCompatActivity() {
         val lastRecipeId = sharedPreferences.getString("last_recipe_id", null)
 
         if (lastFragmentId != -1) {
-            val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
 
             if (navController.currentDestination?.id != lastFragmentId) {
                 if (lastFragmentId == R.id.displaySavedRecipeFragment && lastRecipeId != null) {
@@ -243,7 +241,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
         return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp()
     }
 
@@ -255,7 +252,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setUpActionBarForFragment(fragment: Fragment) {
-        val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
         binding.toolbar.menu.clear()
         when (fragment) {
             is NewRecipeFragment -> {
@@ -274,7 +270,6 @@ class MainActivity : AppCompatActivity() {
     fun setUpActionBarForTemporaryRecipes(enable: Boolean) {
         binding.toolbar.menu.clear()
         if (enable) {
-            val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
             binding.toolbar.inflateMenu(R.menu.return_home_menu)
             binding.toolbar.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
@@ -300,11 +295,19 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
-
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_delete_recipe -> {
-                    deleteRecipe(recipeId)
+                    ConfirmationDialog{
+                        deleteRecipe(recipeId)
+                        navController.navigate(
+                            R.id.newRecipeFragment,
+                            null,
+                            NavOptions.Builder()
+                                .setPopUpTo(navController.graph.startDestinationId, true)
+                                .build()
+                        )
+                    }.show(supportFragmentManager, "ConfirmationDialog")
                     true
                 }
                 else -> false

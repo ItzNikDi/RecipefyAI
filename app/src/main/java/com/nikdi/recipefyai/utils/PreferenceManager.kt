@@ -2,6 +2,7 @@ package com.nikdi.recipefyai.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 class PreferenceManager(context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("PermissionPrefs", Context.MODE_PRIVATE)
@@ -11,6 +12,6 @@ class PreferenceManager(context: Context) {
     }
 
     fun setFirstRun(isFirstRun: Boolean) {
-        sharedPreferences.edit().putBoolean("is_first_run", isFirstRun).apply()
+        sharedPreferences.edit() { putBoolean("is_first_run", isFirstRun) }
     }
 }

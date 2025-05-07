@@ -176,8 +176,8 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
         withContext(Dispatchers.IO) {
             yoloDetector = YOLODetector(
                 context = requireContext(),
-                modelPath = "internet.tflite",
-                labelPath = "labels.txt",
+                modelPath = "large_16.tflite",
+                labelPath = "food_labels.txt",
                 detectorListener = this@IngredientSelectionFragment,
                 message = { msg -> Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show() }
             )

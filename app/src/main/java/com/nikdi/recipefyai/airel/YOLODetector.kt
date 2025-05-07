@@ -52,15 +52,15 @@ class YOLODetector(
         val inputShape = interpreter.getInputTensor(0)?.shape()
         val outputShape = interpreter.getOutputTensor(0)?.shape()
 
-        labels.addAll(extractNamesFromMetadata(model))
-        if (labels.isEmpty()) {
+        labels.addAll(extractNamesFromLabelFile(context, labelPath!!))
+        /*if (labels.isEmpty()) {
             if (labelPath == null) {
                 message("Model does not contain metadata, provide LABELS_PATH in Constants.kt")
                 labels.addAll(LabelLoader.TEMP_CLASSES)
             } else {
                 labels.addAll(extractNamesFromLabelFile(context, labelPath))
             }
-        }
+        }*/
 
         if (inputShape != null) {
             tensorWidth = inputShape[1]
@@ -198,7 +198,7 @@ class YOLODetector(
         private const val INPUT_STANDARD_DEVIATION = 255f
         private val INPUT_IMAGE_TYPE = DataType.FLOAT32
         private val OUTPUT_IMAGE_TYPE = DataType.FLOAT32
-        private const val CONFIDENCE_THRESHOLD = 0.45F
-        private const val IOU_THRESHOLD = 0.3F
+        private const val CONFIDENCE_THRESHOLD = 0.4F
+        private const val IOU_THRESHOLD = 0.2F
     }
 }

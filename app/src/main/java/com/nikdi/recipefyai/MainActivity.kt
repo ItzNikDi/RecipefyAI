@@ -1,3 +1,5 @@
+@file:Suppress("OverrideDeprecatedMigration")
+
 package com.nikdi.recipefyai
 
 import android.content.Context
@@ -174,7 +176,7 @@ class MainActivity : AppCompatActivity() {
             val spannableString = SpannableString(menuItem.title)
             spannableString.setSpan(CustomTypefaceSpan("", typeface!!), 0, spannableString.length, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
             menuItem.title = spannableString
-            menuItem.icon = AppCompatResources.getDrawable(this, R.drawable.ic_gallery)
+            menuItem.icon = AppCompatResources.getDrawable(this, R.drawable.ic_cooked_recipe)
             menuItem.setOnMenuItemClickListener {
                 openRecipe(recipe.id)
                 drawerLayout.closeDrawer(GravityCompat.START)

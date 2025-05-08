@@ -17,7 +17,7 @@ class RecipeDetailsDialog : DialogFragment() {
     private val binding get() = _binding!!
 
     interface RecipeDetailsListener {
-        fun onProceed(servings: String, portionSize: String)
+        fun onProceed(servings: String, portionSize: String, cuisine: String)
         fun onCancel(servings: String, portionSize: String)
     }
 
@@ -52,8 +52,9 @@ class RecipeDetailsDialog : DialogFragment() {
         binding.btnProceed.setOnClickListener { view ->
             val servings = binding.servingsInput.text.toString()
             val portionSize = binding.portionSizeInput.text.toString()
+            val cuisine = binding.cuisineInput.text.toString()
             if (validateInputs(view, servings, portionSize)) {
-                listener?.onProceed(servings, portionSize)
+                listener?.onProceed(servings, portionSize, cuisine)
                 dismiss()
             }
         }

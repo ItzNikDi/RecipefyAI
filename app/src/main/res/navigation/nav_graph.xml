@@ -60,6 +60,9 @@
             <argument
                 android:name="portionSize"
                 app:argType="float" />
+            <argument
+                android:name="cuisine"
+                app:argType="string"/>
     </fragment>
     <fragment
         android:id="@+id/displaySavedRecipeFragment"

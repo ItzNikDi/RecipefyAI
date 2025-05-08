@@ -15,7 +15,7 @@ class FromNameDialog : DialogFragment() {
     private val binding get() = _binding!!
 
     interface FromNameListener {
-        fun onProceed(name: String, servings: String, portionSize: String)
+        fun onProceed(name: String, servings: String, portionSize: String, cuisine: String)
     }
 
     private var listener: FromNameListener? = null
@@ -44,8 +44,9 @@ class FromNameDialog : DialogFragment() {
             val recipeName = binding.recipeNameInput.text.toString()
             val servings = binding.servingsInput.text.toString()
             val portionSize = binding.portionSizeInput.text.toString()
+            val cuisine = binding.cuisineInput.text.toString()
             if (validateInputs(view, recipeName, servings, portionSize)) {
-                listener?.onProceed(recipeName, servings, portionSize)
+                listener?.onProceed(recipeName, servings, portionSize, cuisine)
                 dismiss()
             }
         }

@@ -59,13 +59,14 @@ class NewRecipeFragment : Fragment(), FromNameDialog.FromNameListener {
         }
     }
 
-    override fun onProceed(name: String, servings: String, portionSize: String) {
+    override fun onProceed(name: String, servings: String, portionSize: String, cuisine: String) {
         val action = NewRecipeFragmentDirections
             .actionNewRecipeFragmentToTemporaryRecipeFragment(
                 ingredients = null,
                 name,
                 servings.toInt(),
-                portionSize.toFloat())
+                portionSize.toFloat(),
+                cuisine)
         findNavController().navigate(action)
     }
 

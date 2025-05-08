@@ -63,10 +63,10 @@ class TemporaryRecipeFragment : Fragment(), RecipeNameDialog.RecipeNameListener 
 
         val recipeRequest: Any? = when {
             args.ingredients != null -> FromIngredientsRequest(
-                args.ingredients!!.toList(), args.servings, args.portionSize
+                args.ingredients!!.toList(), args.servings, args.portionSize, args.cuisine
             )
             args.name != null -> FromNameRequest(
-                args.name!!, args.servings, args.portionSize
+                args.name!!, args.servings, args.portionSize, args.cuisine
             )
             else -> null
         }

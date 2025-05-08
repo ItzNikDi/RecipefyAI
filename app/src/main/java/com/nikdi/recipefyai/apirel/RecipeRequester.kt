@@ -15,13 +15,15 @@ interface RecipeRequester {
 data class FromIngredientsRequest(
     @SerializedName("ingredients") val ingredients: List<String>,
     @SerializedName("servings") val servings: Int,
-    @SerializedName("portion_size") val portionSize: Float
+    @SerializedName("portion_size") val portionSize: Float,
+    @SerializedName("cuisine") val cuisine: String
 )
 
 data class FromNameRequest(
     @SerializedName("name") val name: String,
     @SerializedName("servings") val servings: Int,
-    @SerializedName("portion_size") val portionSize: Float
+    @SerializedName("portion_size") val portionSize: Float,
+    @SerializedName("cuisine") val cuisine: String
 )
 
 data class RecipeResponse(

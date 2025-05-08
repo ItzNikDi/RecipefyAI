@@ -245,7 +245,7 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
         selectedPortionSize = portionSize
     }
 
-    override fun onProceed(servings: String, portionSize: String) {
+    override fun onProceed(servings: String, portionSize: String, cuisine: String) {
         selectedServings = servings
         selectedPortionSize = portionSize
 
@@ -254,7 +254,8 @@ class IngredientSelectionFragment : Fragment(), YOLODetector.DetectorListener, R
                 ingredientsList.toTypedArray(),
                 name = null,
                 servings.toInt(),
-                portionSize.toFloat())
+                portionSize.toFloat(),
+                cuisine)
         findNavController().navigate(action)
     }
 

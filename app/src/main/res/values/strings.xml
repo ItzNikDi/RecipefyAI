@@ -36,6 +36,8 @@
     <string name="servings">Порции:</string>
     <string name="name">Име:</string>
     <string name="portion_size">Грамаж\n(на порция):</string>
+    <string name="cuisine">Кухня\n(регион):</string>
+    <string name="bg_cuisine">българска</string>
     <string name="servings_empty">Моля въведете брой порции!</string>
     <string name="portion_size_empty">Моля въведете размер на порцията!</string>
     <string name="regenerate_recipe">Създай друга рецепта</string>

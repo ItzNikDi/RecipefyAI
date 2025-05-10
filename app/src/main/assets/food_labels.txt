@@ -1,132 +1,132 @@
-bread-wholemeal
-jam
-water
-bread-sourdough
-banana
-soft-cheese
-ham-raw
-hard-cheese
-cottage-cheese
-bread-half-white
-coffee-with-caffeine
-fruit-salad
-pancakes
-tea
-salmon-smoked
-avocado
-spring-onion-scallion
-ristretto-with-caffeine
-ham
-egg
-bacon-frying
-chips-french-fries
-juice-apple
-chicken
-tomato-raw
-broccoli
-shrimp-boiled
-beetroot-steamed-without-addition-of-salt
-carrot-raw
-chickpeas
-french-salad-dressing
-pasta-hornli
-sauce-cream
-meat-balls
-pasta
-tomato-sauce
-cheese
-pear
-cashew-nut
-almonds
-lentils
-mixed-vegetables
-peanut-butter
-apple
-blueberries
-cucumber
-cocoa-powder
-greek-yaourt-yahourt-yogourt-ou-yoghourt
-maple-syrup-concentrate
-buckwheat-grain-peeled
-butter
-herbal-tea
-mayonnaise
-soup-vegetable
-wine-red
-wine-white
-green-bean-steamed-without-addition-of-salt
-sausage
-pizza-margherita-baked
-salami
-mushroom
-bread-meat-substitute-lettuce-sauce
-tart
-tea-verveine
-rice
-white-coffee-with-caffeine
-linseeds
-sunflower-seeds
-ham-cooked
-bell-pepper-red-raw
-zucchini
-green-asparagus
-tartar-sauce
-lye-pretzel-soft
-cucumber-pickled
-curry-vegetarian
-yaourt-yahourt-yogourt-ou-yoghourt-natural
-soup-of-lentils-dahl-dhal
-soup-cream-of-vegetables
-balsamic-vinegar
-salmon
-salt-cake-vegetables-filled
-bacon
-orange
-pasta-noodles
-cream
-cake-chocolate
-pasta-spaghetti
-black-olives
-parmesan
-spaetzle
-salad-lambs-ear
-salad-leaf-salad-green
-potatoes-steamed
-white-cabbage
-halloumi
-beetroot-raw
-bread-grain
-applesauce-unsweetened-canned
-cheese-for-raclette
-mushrooms
-bread-white
-curds-natural-with-at-most-10-fidm
-bagel-without-filling
-quiche-with-cheese-baked-with-puff-pastry
-soup-potato
-bouillon-vegetable
-beef-sirloin-steak
-taboule-prepared-with-couscous
-eggplant
-bread
-turnover-with-meat-small-meat-pie-empanadas
-mungbean-sprouts
-mozzarella
-pasta-penne
-lasagne-vegetable-prepared
-mandarine
-kiwi
-french-beans
-tartar-meat
-spring-roll-fried
-pork-chop
-caprese-salad-tomato-mozzarella
-leaf-spinach
-roll-of-half-white-or-white-flour-with-large-void
-pasta-ravioli-stuffing
-omelette-plain
-tuna
-dark-chocolate
+bread-wholemeal - хляб
+jam - сладко
+water - вода
+bread-sourdough - хляб с квас
+banana - банан
+soft-cheese - меко сирене (кашкавал?)
+ham-raw - сурова шунка
+hard-cheese - твърдо сирене
+cottage-cheese - зърнесто сирене
+bread-half-white - типов хляб
+coffee-with-caffeine - кафе с кофеин
+fruit-salad - плодова салата
+pancakes - палачинки
+tea - чай
+salmon-smoked - пушена сьомга
+avocado - авокадо
+spring-onion-scallion - зелен лук
+ristretto-with-caffeine - късо кафе
+ham - шунка
+egg - яйце
+bacon-frying - пържен бекон
+chips-french-fries - пържени картофи
+juice-apple - ябълков сок
+chicken - пилешко месо
+tomato-raw - домат
+broccoli - броколи
+shrimp-boiled - варени скариди
+beetroot-steamed-without-addition-of-salt - задушен панджар
+carrot-raw - морков
+chickpeas - нахут
+french-salad-dressing - френски дресинг
+pasta-hornli - паста (обратен завой)
+sauce-cream -
+meat-balls - кюфтета
+pasta - паста
+tomato-sauce - доматен сос
+cheese - сирене
+pear - круша
+cashew-nut = кашу
+almonds - бадеми
+lentils - леща
+mixed-vegetables = микс от зеленчуци
+peanut-butter - фастъчено масло
+apple - ябълка
+blueberries - сини боровинки
+cucumber - краставица
+cocoa-powder - какао на прах
+greek-yaourt-yahourt-yogourt-ou-yoghourt - кисело мляко
+maple-syrup-concentrate - кленов сироп
+buckwheat-grain-peeled - белена елда
+butter - масло
+herbal-tea - билков чай
+mayonnaise - майонеза
+soup-vegetable - зеленчукова супа
+wine-red - червено вино
+wine-white - бяло вино
+green-bean-steamed-without-addition-of-salt - задушен зелен боб
+sausage - наденичка
+pizza-margherita-baѝked - пица маргарита
+salami - салам
+mushroom - гъби
+bread-meat-substitute-lettuce-sauce -
+tart - тарт
+tea-verveine - чай от вербника
+rice - ориз
+white-coffee-with-caffeine - кафе с мляко
+linseeds - ленени семки
+sunflower-seeds - слънчогледови семки
+ham-cooked - готвена шунка
+bell-pepper-red-raw - сурова чушка
+zucchini - тиквичка
+green-asparagus - зелени аспержи
+tartar-sauce - сос тартар
+lye-pretzel-soft - брецел
+cucumber-pickled - кисели краставички
+curry-vegetarian - вегетарианско къри
+yaourt-yahourt-yogourt-ou-yoghourt-natural - кисело мляко
+soup-of-lentils-dahl-dhal - супа леща
+soup-cream-of-vegetables - крем супа от зеленчуци
+balsamic-vinegar - балсамов оцет
+salmon - сьомга
+salt-cake-vegetables-filled - солена зеленчукова торта
+bacon - бекон
+orange - портокал
+pasta-noodles - нудълс
+cream - сметана
+cake-chocolate - шоколадова торта
+pasta-spaghetti - спагети
+black-olives - черни маслини
+parmesan - пармезан
+spaetzle - шпецле
+salad-lambs-ear - салата със заешки уши
+salad-leaf-salad-green - копфсалата
+potatoes-steamed - варени картофи
+white-cabbage - зеле
+halloumi - халуми
+beetroot-raw - суров панджар
+bread-grain - пълнозърнест хляб
+applesauce-unsweetened-canned - ябълково сладко
+cheese-for-raclette - кашкавал за раклет
+mushrooms - гъби
+bread-white - бял хляб
+curds-natural-with-at-most-10-fidm - извара
+bagel-without-filling - бейгъл
+quiche-with-cheese-baked-with-puff-pastry - киш с кашкавал
+soup-potato - картофена супа
+bouillon-vegetable - зеленчуков бульон
+beef-sirloin-steak - сърлойн стек
+taboule-prepared-with-couscous - салата табуле с кускус
+eggplant - патладжан
+bread - хляб
+turnover-with-meat-small-meat-pie-empanadas - емпанадас с месо
+mungbean-sprouts - боб мунг шушулка
+mozzarella - моцарела
+pasta-penne - пене паста
+lasagne-vegetable-prepared - зеленчукова лазаня
+mandarine - мандарини
+kiwi - киви
+french-beans - зелен боб
+tartar-meat - стек тартар
+spring-roll-fried - пролетни ролца
+pork-chop - свинска пържола
+caprese-salad-tomato-mozzarella - салата капрезе с моцарела
+leaf-spinach - спанак
+roll-of-half-white-or-white-flour-with-large-void -
+pasta-ravioli-stuffing - равиоли
+omelette-plain - чист омлет
+tuna - риба тон
+dark-chocolate - черен шоколад
 sauce-savoury
 dried-raisins
 ice-tea
